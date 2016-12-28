@@ -160,7 +160,6 @@ public class UserAgent extends Agent
 		public void onWake()
 		{
 			sendRequest(cpureq, memreq, exectime, extracpu, extramem);
-			//make changes here
 			textArea.append("\nRequest no: "+req_no+" --> cpu: "+cpureq+" mem: "+memreq+" exectime: "+exectime);
 		}
 	}
