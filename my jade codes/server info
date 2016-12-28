@@ -1,0 +1,36 @@
+Servers 1-6
+
+No. of virtual cores: 20
+Memory (in GB) : 48
+
+Servers 7-12
+
+No. of virtual cores: 40
+Memory (in GB) : 96
+
+Servers 13-18
+
+No. of virtual cores: 60
+Memory (in GB) : 144
+	
+
+VMs:
+Group 1: (VC,Mem)
+Server 1:	2,4		4,10	6,14 	8,20
+Server 2:	2,20	4,14	6,10	8,4
+Server 3:	2,3		4,9		6,16	8,20
+Server 4:	2,20	4,16	6,9		8,3
+Server 5:	2,14	4,4		6,20	8,10
+Server 6:	2,8		4,20	6,4		8,16
+
+Group 2: (VC,Mem)
+Server 7:	2,3		4,6		6,9		8,11	2,13	4,16	6,18	8,20
+Server 8:	2,20	4,18	6,16	8,13	2,11	4,9		6,6		8,3
+Server 9:	2,5		4,20	6,2		8,17	2,15	4,11	6,6		8,18	
+Server 10:	2,10	4,3		6,20	8,9		2,18	4,5		6,16	8,15
+Server 11:	2,13	4,10	6,7		8,20	2,8		4,18	6,13	8,6
+Server 12:	2,18	4,14	6,12	8,4		2,5		4,8		6,15	8,20
+
+Group 3: (VC,Mem)
+VC => 2,4,6,8,2,4,6,8,2,4,6,8
+//yet to fill
