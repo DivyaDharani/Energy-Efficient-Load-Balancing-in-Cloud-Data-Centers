@@ -15,9 +15,9 @@ public class UserAgent extends Agent
 		automateRequests();
 	}
 	
-	public void sendRequest(int cpureq,int memreq, int exectime, int extracpu, int extramem)
+	public void sendRequest(int cpureq,int memreq, int exectime)
 	{
-		VMRequest vmrequest = new VMRequest(cpureq, memreq, exectime, extracpu, extramem);
+		VMRequest vmrequest = new VMRequest(cpureq,memreq,exectime);
 		try
 		{
 			jade.wrapper.AgentContainer agentContainer = getContainerController();
@@ -118,7 +118,7 @@ public class UserAgent extends Agent
 		frame.setSize(500,500);
 		frame.setVisible(true);
 		Random random = new Random();
-		int cpureq, memreq, exectime, timelapse, req_no, extracpu, extramem;
+		int cpureq, memreq, exectime, timelapse, req_no;
 		for(int i=1;i<=10;i++)
 		{
 			req_no = i;
@@ -126,21 +126,18 @@ public class UserAgent extends Agent
 			memreq = random.nextInt(20) + 1;
 			exectime = random.nextInt(10) + 1;
 
-			extracpu = random.nextInt(4); //0 to 3 (approx.)
-			extramem = random.nextInt(5); //0 to 4 (approx.)
-
 			//timelapse = (random.nextInt(10) + 1) * 1000;
 			timelapse = i * 1000;
 			textArea.append("\n----Req.no : "+req_no+"----Time lapse:"+timelapse+" ms");
-			addBehaviour(new AutomateRequestBehaviour(this, timelapse, req_no, cpureq, memreq, exectime, extracpu, extramem, textArea));
+			addBehaviour(new AutomateRequestBehaviour(this, timelapse, req_no, cpureq, memreq, exectime, textArea));
 		}
 	}
 
 	class AutomateRequestBehaviour extends WakerBehaviour 
 	{
-		int cpureq, memreq, exectime, timelapse, req_no, extracpu, extramem;
+		int cpureq, memreq, exectime, timelapse, req_no;
 		JTextArea textArea;
-		public AutomateRequestBehaviour(Agent agent, long millis, int req_no, int cpureq, int memreq, int exectime, int extracpu, int extramem, JTextArea textArea)
+		public AutomateRequestBehaviour(Agent agent, long millis, int req_no, int cpureq, int memreq, int exectime, JTextArea textArea)
 		{
 			super(agent,millis);
 			this.timelapse = timelapse;
@@ -148,14 +145,11 @@ public class UserAgent extends Agent
 			this.cpureq = cpureq;
 			this.memreq = memreq;
 			this.exectime = exectime;
-			this.extracpu = extracpu;
-			this.extramem = extramem;
 			this.textArea = textArea;
 		}
 		public void onWake()
 		{
-			sendRequest(cpureq, memreq, exectime, extracpu, extramem);
-			//make changes here
+			sendRequest(cpureq, memreq, exectime);
 			textArea.append("\nRequest no: "+req_no+" --> cpu: "+cpureq+" mem: "+memreq+" exectime: "+exectime);
 		}
 	}
