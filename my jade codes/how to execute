@@ -1,3 +1,0 @@
-java jade.Boot -gui -agents agent_name:full_package_name.class_name;agent2_name:pack_name.class_name
-
-java jade.Boot -gui -agents ua:UserAgent
