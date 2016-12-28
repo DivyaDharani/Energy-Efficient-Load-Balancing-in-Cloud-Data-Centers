@@ -126,7 +126,7 @@ public class FrontEndAgent extends Agent
 								System.out.println(str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5);
 
 								//running the selected virtual machine
-								selectedvm.runMachine(vmrequest.exec_time);
+								selectedvm.runMachine(vmrequest);
 
 								break;
 							}
