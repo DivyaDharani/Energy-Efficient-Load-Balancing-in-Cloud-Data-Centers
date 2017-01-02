@@ -15,9 +15,9 @@ public class UserAgent extends Agent
 		automateRequests();
 	}
 	
-	public void sendRequest(int cpureq,int memreq, int exectime, int extracpu, int extramem)
+	public void sendRequest(int cpureq,int memreq, int exectime, int extra_cpu, int extra_mem)
 	{
-		VMRequest vmrequest = new VMRequest(cpureq, memreq, exectime, extracpu, extramem);
+		VMRequest vmrequest = new VMRequest(cpureq, memreq, exectime, extra_cpu, extra_mem);
 		try
 		{
 			jade.wrapper.AgentContainer agentContainer = getContainerController();
@@ -69,8 +69,8 @@ public class UserAgent extends Agent
 					int exectime = Integer.parseInt(exectext.getText());
 					
 					Random random = new Random();
-					int extracpu = random.nextInt(4); //0 to 3 (approx.)
-					int extramem = random.nextInt(5); //0 to 4 (approx.)
+					int extra_cpu = random.nextInt(4); //0 to 3 (approx.)
+					int extra_mem = random.nextInt(5); //0 to 4 (approx.)
 					
 					/*ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 					message.addReceiver(new AID("fa",AID.ISLOCALNAME));
@@ -100,7 +100,7 @@ public class UserAgent extends Agent
 						ex.printStackTrace();
 					}*/
 
-					sendRequest(cpureq,memreq,exectime, extracpu, extramem);
+					sendRequest(cpureq,memreq,exectime, extra_cpu, extra_mem);
 				}
 
 			});

@@ -38,14 +38,16 @@ public class AgentStarter extends Agent
 			// ac.start();
 			ac[inc++] = cc.createNewAgent("fa","FrontEndAgent",null);
 			// ac.start();
-			//creating server manager agents
+
+			/*//creating server manager agents
 			for(i=1;i<=sma;i++)
 			{
 				ac[inc++] = cc.createNewAgent("sma"+i,"ServerManagerAgent",new Object[]{i,num_of_vms(i)});//passing server's ID and no. of vms in it
 				// ac.start();
-			}
+			}*/
 
-			//creating virtual machine agents
+			//creating SMAs and VMAs
+
 			File memfile = new File("mem capacity.txt");
 			File cpufile = new File("cpu capacity.txt");
 			FileReader memfilereader = new FileReader(memfile);
@@ -62,6 +64,18 @@ public class AgentStarter extends Agent
 				cpuarr = cpustr.split(" ");
 				memstr = membf.readLine();
 				memarr = memstr.split(" ");
+
+				//computing total cpu and mem capacities of server machine 'i'
+				int total_cpu = 0, total_mem = 0, t;
+				for(t = 0; t < cpuarr.length; t++)
+					total_cpu += Integer.parseInt(cpuarr[t]);
+				for(t = 0; t < memarr.length; t++)
+					total_mem += Integer.parseInt(memarr[t]);
+
+				//creating SMA
+				ac[inc++] = cc.createNewAgent("sma"+i,"ServerManagerAgent",new Object[]{i, num_of_vms(i), total_cpu, total_mem});//passing server's ID, no. of vms in it, and total cpu and memory capacities 
+
+				//creating VMAs of server 'i'
 				j = num_of_vms(i);
 				for(k=0;k<j;k++)
 				{

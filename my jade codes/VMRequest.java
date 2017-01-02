@@ -3,15 +3,15 @@ public class VMRequest
 	int cpu_capacity; //(no. of virtual cores)
 	int mem_capacity;
 	int exec_time;
-	int extracpu;
-	int extramem;
+	int extra_cpu;
+	int extra_mem;
 
-	public VMRequest(int cpu_capacity, int mem_capacity, int exec_time, int extracpu, int extramem)
+	public VMRequest(int cpu_capacity, int mem_capacity, int exec_time, int extra_cpu, int extra_mem)
 	{
 		this.cpu_capacity = cpu_capacity;
 		this.mem_capacity = mem_capacity;
 		this.exec_time = exec_time;
-		this.extracpu = extracpu;
-		this.extramem = extramem;
+		this.extra_cpu = extra_cpu;
+		this.extra_mem = extra_mem;
 	}
 }

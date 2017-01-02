@@ -21,11 +21,23 @@ public class VirtualMachine
 		this.mem_capacity = mem_capacity;
 	}
 
-	public void runMachine(VMRequest vmrequest) //time in seconds
+	public void runMachine(VMRequest vmrequest) //execution time in seconds
 	{ 
 		status = VirtualMachine.BUSY;
 		cpu_occupied = vmrequest.cpu_capacity;
 		mem_occupied = vmrequest.mem_capacity;
+
+		int extra_cpu_available = cpu_capacity - cpu_occupied;
+		int extra_mem_available = mem_capacity - mem_occupied;
+
+		if(vmrequest.extra_cpu <= extra_cpu_available && vmrequest.extra_mem <= extra_mem_available)
+			; //no migration required
+		else
+		{
+			//migration needed
+		}
+
+		int extra_mem = vmrequest.extra_mem;
 
 		new java.util.Timer().schedule(new java.util.TimerTask(){
 			public void run()
@@ -35,6 +47,6 @@ public class VirtualMachine
 				mem_occupied = 0;
 				status = VirtualMachine.FREE;
 			}
-		}, vmrequest.exec_time * 1000);
+		}, vmrequest.exec_time * 1000); 
 	}
 }
