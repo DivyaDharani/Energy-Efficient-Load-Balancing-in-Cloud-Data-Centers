@@ -8,7 +8,7 @@ import java.util.*;
 public class ServerManagerAgent extends Agent
 {
 	int ID, num_of_vms, total_cpu, total_mem;
-	int cpu_threshold, mem_threshold; 
+	double cpu_threshold, mem_threshold; 
 	public void setup()
 	{
 		setEnabledO2ACommunication(true,0);
@@ -17,10 +17,24 @@ public class ServerManagerAgent extends Agent
 		num_of_vms = (Integer)args[1];
 		total_cpu = (Integer)args[2];
 		total_mem = (Integer)args[3];
-		System.out.println("Server "+ID+" -> Total CPU = "+total_cpu+"; Total Mem = "+total_mem);
 		// System.out.println(getLocalName()+" with ID "+ID+" is started.(No. of vms => "+num_of_vms+")");
+		addBehaviour(new ThresholdSetUp());
 		addBehaviour(new RequestGetter());
  	}
+
+ 	class ThresholdSetUp extends OneShotBehaviour
+ 	{
+ 		public void action()
+ 		{
+ 			//temporary threshold set up (75%)
+ 			cpu_threshold = 0.75 * total_cpu;
+ 			mem_threshold = 0.75 * total_mem;
+ 			// System.out.println("Server "+ID+" -> Total CPU = "+total_cpu+"; Total mem = "+total_mem);
+ 			// System.out.println("Server "+ID+" -> CPU threshold = "+cpu_threshold+"; Mem threshold = "+mem_threshold);
+ 		}
+ 	}
+
+
  	class RequestGetter extends CyclicBehaviour
  	{
  		MessageTemplate msgtemplate;
