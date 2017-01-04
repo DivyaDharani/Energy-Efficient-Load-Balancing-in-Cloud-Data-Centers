@@ -114,31 +114,48 @@ public class UserAgent extends Agent
 
 	public void automateRequests()
 	{
-		JFrame frame = new JFrame("VM instances");
-		JTextArea textArea = new JTextArea();
-		textArea.setLineWrap(true);
-		textArea.setWrapStyleWord(true);
-		JScrollPane scrollPane = new JScrollPane(textArea);
-		frame.add(scrollPane);
-		frame.setSize(500,500);
+		JFrame frame = new JFrame("");
+		frame.setSize(200,200);
+		JButton button = new JButton("Start Request Automation");
+		button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					JFrame frame = new JFrame("VM instances");
+					JTextArea textArea = new JTextArea();
+					textArea.setLineWrap(true);
+					textArea.setWrapStyleWord(true);
+					JScrollPane scrollPane = new JScrollPane(textArea);
+					frame.add(scrollPane);
+					frame.setSize(500,500);
+					frame.setVisible(true);
+					Random random = new Random();
+					int cpureq, memreq, exectime, timelapse, req_no, extracpu, extramem;
+					for(int i=1;i<=10;i++)
+					{
+						req_no = i;
+						cpureq = random.nextInt(8) + 1;
+						memreq = random.nextInt(20) + 1;
+						exectime = random.nextInt(10) + 1;
+
+						extracpu = random.nextInt(4); //0 to 3 (approx.)
+						extramem = random.nextInt(5); //0 to 4 (approx.)
+
+						//timelapse = (random.nextInt(10) + 1) * 1000;
+						timelapse = i * 1000;
+						textArea.append("\n----Req.no : "+req_no+"----Time lapse:"+timelapse+" ms");
+						addBehaviour(new AutomateRequestBehaviour(new Agent(), timelapse, req_no, cpureq, memreq, exectime, extracpu, extramem, textArea));
+					}
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
+			}
+		});
+		frame.add(button);
 		frame.setVisible(true);
-		Random random = new Random();
-		int cpureq, memreq, exectime, timelapse, req_no, extracpu, extramem;
-		for(int i=1;i<=10;i++)
-		{
-			req_no = i;
-			cpureq = random.nextInt(8) + 1;
-			memreq = random.nextInt(20) + 1;
-			exectime = random.nextInt(10) + 1;
-
-			extracpu = random.nextInt(4); //0 to 3 (approx.)
-			extramem = random.nextInt(5); //0 to 4 (approx.)
-
-			//timelapse = (random.nextInt(10) + 1) * 1000;
-			timelapse = i * 1000;
-			textArea.append("\n----Req.no : "+req_no+"----Time lapse:"+timelapse+" ms");
-			addBehaviour(new AutomateRequestBehaviour(this, timelapse, req_no, cpureq, memreq, exectime, extracpu, extramem, textArea));
-		}
 	}
 
 	class AutomateRequestBehaviour extends WakerBehaviour 

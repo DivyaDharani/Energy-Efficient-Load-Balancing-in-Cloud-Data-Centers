@@ -4,11 +4,13 @@ import jade.lang.acl.*;
 import jade.wrapper.*;
 import javax.swing.*;
 import java.util.*;
+import java.io.*;
 
 public class ServerManagerAgent extends Agent
 {
 	int ID, num_of_vms, total_cpu, total_mem;
-	double cpu_threshold, mem_threshold; 
+	double cpu_threshold, mem_threshold;
+	VirtualMachine[] vm; 
 	public void setup()
 	{
 		setEnabledO2ACommunication(true,0);
@@ -17,25 +19,15 @@ public class ServerManagerAgent extends Agent
 		num_of_vms = (Integer)args[1];
 		total_cpu = (Integer)args[2];
 		total_mem = (Integer)args[3];
+		vm = new VirtualMachine[num_of_vms];
 		// System.out.println(getLocalName()+" with ID "+ID+" is started.(No. of vms => "+num_of_vms+")");
-		addBehaviour(new ThresholdSetUp());
 		addBehaviour(new RequestGetter());
+		addBehaviour(new VMInstanceGathering());
+		addBehaviour(new ThresholdSetUp());
+		addBehaviour(new ThresholdMonitoring());
  	}
 
- 	class ThresholdSetUp extends OneShotBehaviour
- 	{
- 		public void action()
- 		{
- 			//temporary threshold set up (75%)
- 			cpu_threshold = 0.75 * total_cpu;
- 			mem_threshold = 0.75 * total_mem;
- 			// System.out.println("Server "+ID+" -> Total CPU = "+total_cpu+"; Total mem = "+total_mem);
- 			// System.out.println("Server "+ID+" -> CPU threshold = "+cpu_threshold+"; Mem threshold = "+mem_threshold);
- 		}
- 	}
-
-
- 	class RequestGetter extends CyclicBehaviour
+	class RequestGetter extends CyclicBehaviour
  	{
  		MessageTemplate msgtemplate;
  		String[] strarr;
@@ -101,6 +93,46 @@ public class ServerManagerAgent extends Agent
  				// reply.setOntology("requesting-for-capacity");
  				reply.setContent();*/
  			}
+ 		}
+ 	}
+
+ 	class VMInstanceGathering extends OneShotBehaviour
+ 	{
+ 		Object obj = null;
+ 		public void action()
+ 		{
+ 			for(int i = 0; i < num_of_vms; i++)
+ 			{
+ 				while((obj = getO2AObject()) == null)
+ 					;
+ 				if(obj.getClass().getSimpleName().equals("VirtualMachine"))
+ 				{
+ 					vm[i] = (VirtualMachine)obj;
+ 					System.out.println("Server "+ID+" => VM instance "+(i+1)+" received");
+ 				}
+ 			} 			
+ 		}
+ 	}
+
+ 	class ThresholdSetUp extends OneShotBehaviour
+ 	{
+ 		public void action()
+ 		{
+ 			//temporary threshold set up (75%) 
+ 			cpu_threshold = 0.75 * total_cpu;
+ 			mem_threshold = 0.75 * total_mem;
+ 			// System.out.println("Server "+ID+" -> Total CPU = "+total_cpu+"; Total mem = "+total_mem);
+ 			// System.out.println("Server "+ID+" -> CPU threshold = "+cpu_threshold+"; Mem threshold = "+mem_threshold);
+ 		}
+ 	}
+
+ 	class ThresholdMonitoring extends CyclicBehaviour 
+ 	{
+ 		public void action()
+ 		{
+ 			//see if resource occupied exceeds threshold
+
+ 			//get resource usage details from vm instance array
  		}
  	}
 }

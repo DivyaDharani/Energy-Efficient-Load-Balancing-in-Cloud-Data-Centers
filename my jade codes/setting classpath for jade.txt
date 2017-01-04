@@ -22,5 +22,6 @@ set classpath=D:\Divya 2013506015\JADE-all-4.4.0\JADE-bin-4.4.0\jade\lib\jade.ja
 
 D:
 cd "Divya 2013506015\Load Balancing in Cloud\my jade codes"
+javac *.java
 java jade.Boot -gui -agents starter:AgentStarter
 
