@@ -139,8 +139,8 @@ public class UserAgent extends Agent
 						memreq = random.nextInt(20) + 1;
 						exectime = random.nextInt(10) + 1;
 
-						extracpu = random.nextInt(4); //0 to 3 (approx.)
-						extramem = random.nextInt(5); //0 to 4 (approx.)
+						extracpu = random.nextInt((int)(cpureq / 2)); //0 to half the cpu request
+						extramem = random.nextInt((int)(memreq / 2)); //0 to half the mem request
 
 						//timelapse = (random.nextInt(10) + 1) * 1000;
 						timelapse = i * 1000;

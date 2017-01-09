@@ -30,8 +30,14 @@ public class VirtualMachine
 		int extra_cpu_available = cpu_capacity - cpu_occupied;
 		int extra_mem_available = mem_capacity - mem_occupied;
 
+		//randomize the time (or just 75% of the execution time)within the execution time - to find 'when' the vm needs extra resources
+ 		//run this after some random amount of time
 		if(vmrequest.extra_cpu <= extra_cpu_available && vmrequest.extra_mem <= extra_mem_available)
-			; //no migration required
+		{	
+			//no migration required
+			cpu_occupied += vmrequest.extra_cpu;
+			mem_occupied += vmrequest.extra_mem;
+		}
 		else
 		{
 			//migration needed

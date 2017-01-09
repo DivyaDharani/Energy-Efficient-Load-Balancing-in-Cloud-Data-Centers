@@ -10,6 +10,8 @@ public class ServerManagerAgent extends Agent
 {
 	int ID, num_of_vms, total_cpu, total_mem;
 	double cpu_threshold, mem_threshold;
+	int cpu_load, mem_load;
+	double cpu_load_percentage, mem_load_percentage;
 	VirtualMachine[] vm; 
 	public void setup()
 	{
@@ -25,6 +27,17 @@ public class ServerManagerAgent extends Agent
 		addBehaviour(new VMInstanceGathering());
 		addBehaviour(new ThresholdSetUp());
 		addBehaviour(new ThresholdMonitoring());
+ 	}
+
+ 	public void calculateLoad()
+ 	{
+ 		for(int i = 0; i < num_of_vms; i++)
+ 		{
+ 			cpu_load = vm[i].cpu_occupied; //total load of all VMs
+ 			mem_load = vm[i].mem_occupied;
+ 			cpu_load_percentage = (cpu_load / total_cpu) * 100;
+ 			mem_load_percentage = (mem_load / total_mem) * 100;
+ 		}
  	}
 
 	class RequestGetter extends CyclicBehaviour
@@ -118,11 +131,12 @@ public class ServerManagerAgent extends Agent
  	{
  		public void action()
  		{
- 			//temporary threshold set up (75%) 
+ 			//threshold specific to the capacity of this server
  			cpu_threshold = 0.75 * total_cpu;
  			mem_threshold = 0.75 * total_mem;
- 			// System.out.println("Server "+ID+" -> Total CPU = "+total_cpu+"; Total mem = "+total_mem);
- 			// System.out.println("Server "+ID+" -> CPU threshold = "+cpu_threshold+"; Mem threshold = "+mem_threshold);
+ 			//threshold based on usage percentage => 75%
+ 			cpu_threshold_percentage = 75;
+ 			mem_threshold_percentage = 75;
  		}
  	}
 
@@ -133,6 +147,9 @@ public class ServerManagerAgent extends Agent
  			//see if resource occupied exceeds threshold
 
  			//get resource usage details from vm instance array
+
+ 			// if(cpu_load_percentage > cpu_threshold_percentage)
+ 				
  		}
  	}
 }
