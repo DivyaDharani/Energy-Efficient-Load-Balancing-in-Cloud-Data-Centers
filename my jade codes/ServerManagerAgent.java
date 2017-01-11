@@ -11,7 +11,7 @@ public class ServerManagerAgent extends Agent
 	int ID, num_of_vms, total_cpu, total_mem;
 	double cpu_load_threshold, mem_load_threshold;
 	int cpu_load, mem_load, cpu_load_activation_threshold, mem_load_activation_threshold, cpu_load_activation_count, mem_load_activation_count;
-	double cpu_load_percentage, mem_load_percentage, cpu_load_threshold_percentage, mem_load_threshold_percentagek,; 
+	double cpu_load_percentage, mem_load_percentage, cpu_load_threshold_percentage, mem_load_threshold_percentage; 
 	VirtualMachine[] vm; 
 	public void setup()
 	{
