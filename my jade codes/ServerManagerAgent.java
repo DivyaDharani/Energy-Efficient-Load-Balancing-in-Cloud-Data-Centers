@@ -9,9 +9,9 @@ import java.io.*;
 public class ServerManagerAgent extends Agent
 {
 	int ID, num_of_vms, total_cpu, total_mem;
-	double cpu_threshold, mem_threshold;
-	int cpu_load, mem_load;
-	double cpu_load_percentage, mem_load_percentage;
+	double cpu_load_threshold, mem_load_threshold;
+	int cpu_load, mem_load, cpu_load_activation_threshold, mem_load_activation_threshold, cpu_load_activation_count, mem_load_activation_count;
+	double cpu_load_percentage, mem_load_percentage, cpu_load_threshold_percentage, mem_load_threshold_percentagek,; 
 	VirtualMachine[] vm; 
 	public void setup()
 	{
@@ -132,24 +132,38 @@ public class ServerManagerAgent extends Agent
  		public void action()
  		{
  			//threshold specific to the capacity of this server
- 			cpu_threshold = 0.75 * total_cpu;
- 			mem_threshold = 0.75 * total_mem;
+ 			cpu_load_threshold = 0.75 * total_cpu;
+ 			mem_load_threshold = 0.75 * total_mem;
  			//threshold based on usage percentage => 75%
- 			cpu_threshold_percentage = 75;
- 			mem_threshold_percentage = 75;
- 		}
+ 			cpu_load_threshold_percentage = 75;
+ 			mem_load_threshold_percentage = 75;
+
+ 			cpu_load_activation_threshold = 3;
+ 			mem_load_activation_threshold = 3;
+
+  		}
  	}
 
  	class ThresholdMonitoring extends CyclicBehaviour 
  	{
  		public void action()
  		{
- 			//see if resource occupied exceeds threshold
+ 			calculateLoad();
+ 			if(cpu_load_percentage > cpu_load_threshold_percentage)
+ 				cpu_load_activation_count ++;
+ 			if(mem_load_percentage > mem_load_threshold_percentage)
+ 				mem_load_activation_count ++;
 
- 			//get resource usage details from vm instance array
-
- 			// if(cpu_load_percentage > cpu_threshold_percentage)
- 				
+ 			if((cpu_load_activation_count > cpu_load_activation_threshold) || (mem_load_activation_count > mem_load_activation_threshold))
+ 			{
+ 				//trigger migration ----------------------------------------------------
+ 				//----------------------------------------------------------------------
+ 				JOptionPane.showMessageDialog(null, "Migration - to be triggered for Server "+ID+" !!");
+ 				if(cpu_load_activation_threshold > cpu_load_activation_threshold)
+ 					cpu_load_activation_count = 0;
+ 				if(mem_load_activation_count > mem_load_activation_threshold)
+ 					mem_load_activation_count = 0;
+ 			}
  		}
  	}
 }
