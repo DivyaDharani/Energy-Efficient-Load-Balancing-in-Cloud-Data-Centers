@@ -48,7 +48,6 @@ public class VirtualMachine
 				}
 			}
 		}, (int)(vmrequest.exec_time * 0.75 * 1000)); 
-		
 
 		int extra_mem = vmrequest.extra_mem;
 
