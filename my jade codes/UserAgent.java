@@ -141,6 +141,10 @@ public class UserAgent extends Agent
 
 						int cpu_bound = cpureq / 2;
 						int mem_bound = memreq / 2;
+						if(cpu_bound == 0)
+							cpu_bound = 1;
+						if(mem_bound == 0)
+							mem_bound = 1;
 						extracpu = random.nextInt(cpu_bound); //0 to half the cpu request
 						extramem = random.nextInt(mem_bound); //0 to half the mem request
 
