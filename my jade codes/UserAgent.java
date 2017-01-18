@@ -9,6 +9,7 @@ import java.util.*;
 
 public class UserAgent extends Agent
 {
+	int sma_count = 12;
 	public void setup()
 	{	
 		addBehaviour(new UserAgentGUI());
@@ -122,6 +123,21 @@ public class UserAgent extends Agent
 			{
 				try
 				{
+					/*String msg = "start-threshold-monitoring";
+					
+					jade.wrapper.AgentContainer container = getContainerController();
+					for(int i=1;i<=sma_count;i++)
+					{
+						AgentController agentcont = container.getAgent("sma"); //ContainerController's method - getAgent()
+						agentcont.putO2AObject(msg,false);
+					}*/
+					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+					msg.setOntology("start-threshold-monitoring");
+					for(int i=1;i<=sma_count;i++)
+						msg.addReceiver(new AID("sma"+i,AID.ISLOCALNAME));
+					send(msg);
+
+					
 					JFrame frame = new JFrame("VM instances");
 					JTextArea textArea = new JTextArea();
 					textArea.setLineWrap(true);

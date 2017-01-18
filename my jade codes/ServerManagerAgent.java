@@ -24,9 +24,8 @@ public class ServerManagerAgent extends Agent
 		vm = new VirtualMachine[num_of_vms];
 		// System.out.println(getLocalName()+" with ID "+ID+" is started.(No. of vms => "+num_of_vms+")");
 		addBehaviour(new RequestGetter());
-		addBehaviour(new VMInstanceGathering());
-		addBehaviour(new ThresholdSetUp());
-		addBehaviour(new ThresholdMonitoring());
+		addBehaviour(new TriggerThresholdMonitoring());
+		
  	}
 
  	public void calculateLoad()
@@ -109,6 +108,22 @@ public class ServerManagerAgent extends Agent
  		}
  	}
 
+ 	class TriggerThresholdMonitoring extends CyclicBehaviour
+ 	{
+ 		public void action()
+ 		{
+			MessageTemplate msgtemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),MessageTemplate.MatchOntology("start-threshold-monitoring"));
+			ACLMessage msg = receive(msgtemplate);
+			if(msg != null)
+			{
+				System.out.println("Start-threshold-monitoring message received to sma"+ID);
+				addBehaviour(new VMInstanceGathering());
+				addBehaviour(new ThresholdSetUp());
+				addBehaviour(new ThresholdMonitoring());
+				removeBehaviour(this);
+	 		} 			
+ 		}
+ 	}
  	class VMInstanceGathering extends OneShotBehaviour
  	{
  		Object obj = null;
