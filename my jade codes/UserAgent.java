@@ -137,7 +137,7 @@ public class UserAgent extends Agent
 						msg.addReceiver(new AID("sma"+i,AID.ISLOCALNAME));
 					send(msg);
 
-					
+
 					JFrame frame = new JFrame("VM instances");
 					JTextArea textArea = new JTextArea();
 					textArea.setLineWrap(true);
@@ -148,7 +148,7 @@ public class UserAgent extends Agent
 					frame.setVisible(true);
 					Random random = new Random();
 					int cpureq, memreq, exectime, timelapse, req_no, extracpu, extramem;
-					for(int i=1;i<=10;i++)
+					for(int i=1;i<=20;i++)
 					{
 						req_no = i;
 						cpureq = random.nextInt(8) + 1;
@@ -164,8 +164,8 @@ public class UserAgent extends Agent
 						extracpu = random.nextInt(cpu_bound); //0 to half the cpu request
 						extramem = random.nextInt(mem_bound); //0 to half the mem request
 
-						//timelapse = (random.nextInt(10) + 1) * 1000;
-						timelapse = i * 1000;
+						timelapse = (random.nextInt(10) + 1) * 1000;
+						// timelapse = i * 1000;
 						textArea.append("\n----Req.no : "+req_no+"----Time lapse:"+timelapse+" ms");
 						addBehaviour(new AutomateRequestBehaviour(new Agent(), timelapse, req_no, cpureq, memreq, exectime, extracpu, extramem, textArea));
 					}
