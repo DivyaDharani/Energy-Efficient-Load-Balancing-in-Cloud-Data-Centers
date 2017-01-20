@@ -30,6 +30,15 @@ public class AgentStarter extends Agent
 		AgentController[] ac = new AgentController[100];
 		public void action()
 		{
+			JFrame logFrame = new JFrame("Logs");
+			JTextArea logTextArea = new JTextArea();
+			logTextArea.setLineWrap(true);
+			logTextArea.setWrapStyleWord(true);
+			JScrollPane scrollPane = new JScrollPane(logTextArea);
+			logFrame.add(scrollPane);
+			logFrame.setSize(500,500);
+			logFrame.setVisible(true);
+
 			try
 			{
 			cc = getContainerController(); //method of Agent class
@@ -80,7 +89,7 @@ public class AgentStarter extends Agent
 				for(k=0;k<j;k++)
 				{
 					//vm's local name => vma_<server's id>_<vm's local id in the server>
-					ac[inc++] = cc.createNewAgent("vma_"+i+"_"+(k+1),"VirtualMachineAgent", new Object[]{vminc++,k+1,i,Integer.parseInt(cpuarr[k]),Integer.parseInt(memarr[k])});
+					ac[inc++] = cc.createNewAgent("vma_"+i+"_"+(k+1),"VirtualMachineAgent", new Object[]{vminc++,k+1,i,Integer.parseInt(cpuarr[k]),Integer.parseInt(memarr[k]), logTextArea});
 					//passing vm's ID, cpu capacity and mem capacity
 					// ac.start();
 				}

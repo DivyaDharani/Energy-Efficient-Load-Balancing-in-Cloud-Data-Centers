@@ -11,6 +11,7 @@ public class VirtualMachineAgent extends Agent
 	public int cpu_capacity,mem_capacity;
 	public int status = 0; //0 for free; 1 for busy
 	public VirtualMachine vminstance;
+	public JTextArea logTextArea;
 	public void setup()
 	{
 		Object[] args = getArguments();
@@ -20,12 +21,13 @@ public class VirtualMachineAgent extends Agent
 			localID = (Integer)args[1]; //local to the server machine
 			serverID = (Integer)args[2];
 			cpu_capacity = (Integer)args[3];
-			mem_capacity = (Integer)args[4];			
+			mem_capacity = (Integer)args[4];
+			logTextArea = (JTextArea)args[5];			
 		}
 		// JOptionPane.showMessageDialog(null,getLocalName()+" at "+getAID()+" started");
 		// System.out.println(getLocalName()+" with ID "+ID+" in Server "+serverID+" is started with mem_capacity : "+mem_capacity+" cpu_capacity : "+cpu_capacity);
 		
-		vminstance = new VirtualMachine(localID,serverID,getLocalName(),cpu_capacity,mem_capacity);
+		vminstance = new VirtualMachine(localID,serverID,getLocalName(),cpu_capacity,mem_capacity, logTextArea);
 
 		//sending vm instance to this VMA's host's SMA
 		try

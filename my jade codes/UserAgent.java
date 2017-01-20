@@ -148,7 +148,7 @@ public class UserAgent extends Agent
 					frame.setVisible(true);
 					Random random = new Random();
 					int cpureq, memreq, exectime, timelapse, req_no, extracpu, extramem;
-					for(int i=1;i<=20;i++)
+					for(int i=1;i<=10;i++)
 					{
 						req_no = i;
 						cpureq = random.nextInt(8) + 1;

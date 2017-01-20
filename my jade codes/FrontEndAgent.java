@@ -122,7 +122,7 @@ public class FrontEndAgent extends Agent
 
 								String str5 = "\nRequested Virtual Machine : ("+vmrequest.cpu_capacity+","+vmrequest.mem_capacity+")"+"\nVirtual Machine selected: ("+selectedvm.cpu_capacity+","+selectedvm.mem_capacity+")"+" ["+selectedvm.vma_name+"]";
 
-								JOptionPane.showMessageDialog(null,str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5);
+								// JOptionPane.showMessageDialog(null,str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5);
 								System.out.println(str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5);
 
 								//running the selected virtual machine

@@ -11,14 +11,16 @@ public class VirtualMachine
 	int VMID,SMAID;
 	String vma_name;
 	int cpu_weight, mem_weight, total_weight;
+	JTextArea logTextArea;
 
-	public VirtualMachine(int local_id,int server_id,String vma_name,int cpu_capacity,int mem_capacity)
+	public VirtualMachine(int local_id,int server_id,String vma_name,int cpu_capacity,int mem_capacity, JTextArea logTextArea)
 	{
 		this.local_id = local_id;
 		this.server_id = server_id;
 		this.vma_name = vma_name; 
 		this.cpu_capacity = cpu_capacity;
 		this.mem_capacity = mem_capacity;
+		this.logTextArea = logTextArea;
 	}
 
 	public void runMachine(final VMRequest vmrequest) //execution time in seconds
@@ -35,7 +37,8 @@ public class VirtualMachine
 		new java.util.Timer().schedule(new java.util.TimerTask(){
 			public void run()
 			{
-				JOptionPane.showMessageDialog(null, "Extra resource (Virtual Cores = "+vmrequest.extra_cpu+"; Memory = "+vmrequest.extra_mem+")- needed by VM "+vma_name);
+				// JOptionPane.showMessageDialog(null, "Extra resource (Virtual Cores = "+vmrequest.extra_cpu+"; Memory = "+vmrequest.extra_mem+")- needed by VM "+vma_name);
+				logTextArea.append("\nExtra resource (Virtual Cores = "+vmrequest.extra_cpu+"; Memory = "+vmrequest.extra_mem+")- needed by VM "+vma_name);
 				if(vmrequest.extra_cpu <= extra_cpu_available && vmrequest.extra_mem <= extra_mem_available)
 				{	
 					//no migration required
@@ -54,7 +57,8 @@ public class VirtualMachine
 		new java.util.Timer().schedule(new java.util.TimerTask(){
 			public void run()
 			{
-				JOptionPane.showMessageDialog(null,"Execution of VM "+vma_name+" completed");				
+				// JOptionPane.showMessageDialog(null,"Execution of VM "+vma_name+" completed");			
+				logTextArea.append("\nExecution of VM "+vma_name+" completed");
 				cpu_occupied = 0;
 				mem_occupied = 0;
 				status = VirtualMachine.FREE;
