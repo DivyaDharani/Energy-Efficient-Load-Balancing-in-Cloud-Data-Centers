@@ -21,14 +21,14 @@ public class VirtualMachine
 		this.mem_capacity = mem_capacity;
 	}
 
-	public void runMachine(VMRequest vmrequest) //execution time in seconds
+	public void runMachine(final VMRequest vmrequest) //execution time in seconds
 	{ 
 		status = VirtualMachine.BUSY;
 		cpu_occupied = vmrequest.cpu_capacity;
 		mem_occupied = vmrequest.mem_capacity;
 
-		int extra_cpu_available = cpu_capacity - cpu_occupied;
-		int extra_mem_available = mem_capacity - mem_occupied;
+		final int extra_cpu_available = cpu_capacity - cpu_occupied;
+		final int extra_mem_available = mem_capacity - mem_occupied;
 
 		//randomize the time (or just 75% of the execution time)within the execution time - to find 'when' the vm needs extra resources
  		//run this after some random amount of time

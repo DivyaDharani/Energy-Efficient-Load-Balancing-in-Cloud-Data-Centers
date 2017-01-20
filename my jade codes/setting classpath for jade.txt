@@ -1,8 +1,11 @@
-set classpath=D:\Divya\Softwares\JADE-all-4.4.0\JADE-bin-4.4.0\jade\lib\jade.jar;D:\Divya\Softwares\JADE-all-4.4.0\JADE-examples-4.4.0\jade\src;D:\Divya\Softwares\JADE-all-4.4.0\JADE-src-4.4.0\jade\src;D:\Divya\SEM 7\Final year project\jade codes\my jade codes
+set path="C:\Program Files\Java\jdk1.7.0\bin"
+set classpath=D:\Divya\Softwares\JADE-all-4.4.0\JADE-bin-4.4.0\jade\lib\jade.jar;D:\Divya\Softwares\JADE-all-4.4.0\JADE-examples-4.4.0\jade\src;D:\Divya\Softwares\JADE-all-4.4.0\JADE-src-4.4.0\jade\src;D:\Divya\SEM 8\Final year project - Phase 2\Load Balancing in Cloud\my jade codes
 
 
 d:
-cd "Divya\SEM 7\Final year project\jade codes\my jade codes"
+cd "Divya\SEM 8\Final year project - Phase 2\Load Balancing in Cloud\my jade codes"
+javac *.java
+
 java jade.Boot -gui -agents starter:AgentStarter
 
 ----------------------------------------------------------------------------------------------------
