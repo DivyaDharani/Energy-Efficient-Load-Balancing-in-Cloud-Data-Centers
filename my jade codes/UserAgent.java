@@ -164,6 +164,20 @@ public class UserAgent extends Agent
 						extracpu = random.nextInt(cpu_bound); //0 to half the cpu request
 						extramem = random.nextInt(mem_bound); //0 to half the mem request
 
+						int totalcpu  = cpureq + extracpu;
+						int totalmem = memreq + extramem;
+						if(totalcpu > 8)
+						{
+							extracpu = extracpu - (totalcpu - 8); //cpu req = 7, extra cpu needed = 4 => total cpu = 11 => this is not possible; extra cpu can only be 1 in this case so that it will make the total 8. => reduce the extra count above 8, from extra cpu needed. extra cpu = 4 - (11-8) = 1.
+							
+							//or just
+							//extracpu = 8 - cpureq;
+						}
+						if(totalmem > 20)
+						{
+							extramem = extramem - (totalmem - 20);
+						}
+
 						timelapse = (random.nextInt(10) + 1) * 1000;
 						// timelapse = i * 1000;
 						textArea.append("\n----Req.no : "+req_no+"----Time lapse:"+timelapse+" ms");

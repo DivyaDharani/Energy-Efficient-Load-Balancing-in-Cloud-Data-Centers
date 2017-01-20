@@ -1,0 +1,2 @@
+bug identified - extra mem needed = 8 when already request is 16 => so totally 24, which is not possible
+Choosing of vm for request - to be logged in file in FrontEndAgent.java
