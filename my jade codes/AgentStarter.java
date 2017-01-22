@@ -30,7 +30,7 @@ public class AgentStarter extends Agent
 		AgentController[] ac = new AgentController[100];
 		public void action()
 		{
-			JFrame logFrame = new JFrame("Logs");
+			JFrame logFrame = new JFrame(" Job Execution Logs");
 			JTextArea logTextArea = new JTextArea();
 			logTextArea.setLineWrap(true);
 			logTextArea.setWrapStyleWord(true);

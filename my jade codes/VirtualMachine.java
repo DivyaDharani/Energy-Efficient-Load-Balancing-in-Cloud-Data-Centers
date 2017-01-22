@@ -32,13 +32,11 @@ public class VirtualMachine
 		final int extra_cpu_available = cpu_capacity - cpu_occupied;
 		final int extra_mem_available = mem_capacity - mem_occupied;
 
-		//randomize the time (or just 75% of the execution time)within the execution time - to find 'when' the vm needs extra resources
- 		//run this after some random amount of time
+		//randomizing the time (or just 75% of the execution time)within the execution time - to find 'when' the vm needs extra resources
 		new java.util.Timer().schedule(new java.util.TimerTask(){
 			public void run()
 			{
-				// JOptionPane.showMessageDialog(null, "Extra resource (Virtual Cores = "+vmrequest.extra_cpu+"; Memory = "+vmrequest.extra_mem+")- needed by VM "+vma_name);
-				logTextArea.append("\nExtra resource (Virtual Cores = "+vmrequest.extra_cpu+"; Memory = "+vmrequest.extra_mem+")- needed by VM "+vma_name);
+				logTextArea.append("\n"+new Date()+" -> Extra resource (Virtual Cores = "+vmrequest.extra_cpu+"; Memory = "+vmrequest.extra_mem+") - needed by VM "+vma_name);
 				if(vmrequest.extra_cpu <= extra_cpu_available && vmrequest.extra_mem <= extra_mem_available)
 				{	
 					//no migration required
@@ -48,6 +46,7 @@ public class VirtualMachine
 				else
 				{
 					//migration needed
+					logTextArea.append("\n"+new Date()+" -> MIGRATION TO BE TRIGGERED FOR "+vma_name);
 				}
 			}
 		}, (int)(vmrequest.exec_time * 0.75 * 1000)); 
