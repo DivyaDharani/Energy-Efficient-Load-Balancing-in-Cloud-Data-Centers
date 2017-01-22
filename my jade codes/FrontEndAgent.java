@@ -3,6 +3,8 @@ import jade.core.behaviours.*;
 import jade.lang.acl.*;
 import javax.swing.*;
 import jade.wrapper.*;
+import java.io.*;
+import java.util.*;
 
 public class FrontEndAgent extends Agent
 {
@@ -121,9 +123,14 @@ public class FrontEndAgent extends Agent
 								}
 
 								String str5 = "\nRequested Virtual Machine : ("+vmrequest.cpu_capacity+","+vmrequest.mem_capacity+")"+"\nVirtual Machine selected: ("+selectedvm.cpu_capacity+","+selectedvm.mem_capacity+")"+" ["+selectedvm.vma_name+"]";
-
+								String print_string = str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5;
 								// JOptionPane.showMessageDialog(null,str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5);
-								System.out.println(str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5);
+								// System.out.println(print_string);
+								File file = new File("logfile.txt");
+								FileWriter fw = new FileWriter(file, true);
+								fw.write("\n------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+								fw.write("\n"+new Date()+"\n"+print_string);
+								fw.close();
 
 								//running the selected virtual machine
 								selectedvm.runMachine(vmrequest);
