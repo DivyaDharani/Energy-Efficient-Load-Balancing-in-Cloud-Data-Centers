@@ -171,13 +171,74 @@ public class ServerManagerAgent extends Agent
 
  			if((cpu_load_activation_count > cpu_load_activation_threshold) || (mem_load_activation_count > mem_load_activation_threshold))
  			{
- 				//trigger migration ----------------------------------------------------
- 				//----------------------------------------------------------------------
+ 				//trigger migration 
  				JOptionPane.showMessageDialog(null, "Migration - to be triggered for Server "+ID+" !!");
  				if(cpu_load_activation_threshold > cpu_load_activation_threshold)
  					cpu_load_activation_count = 0;
  				if(mem_load_activation_count > mem_load_activation_threshold)
  					mem_load_activation_count = 0;
+
+ 				//choosing VM for migration
+ 				VirtualMachine[] vm_temp = vm.clone();
+ 				int i,j;
+ 				double temp;
+ 				for(i = 0; i < num_of_vms; i++)
+ 				{
+ 					vm_temp[i].cpu_usage = vm_temp[i].cpu_occupied / (vm_temp[i].cpu_capacity * 1.0);
+ 				}
+ 				//sorting acc. to cpu usage
+ 				for(i = 0; i < num_of_vms - 1; i++)
+ 				{
+ 					for(j = i; j < num_of_vms; j++)
+ 					{
+ 						if(vm_temp[i].cpu_usage > vm_temp[j].cpu_usage)
+ 						{
+ 							temp = vm_temp[i].cpu_usage;
+ 							vm_temp[i].cpu_usage = vm_temp[j].cpu_usage;
+ 							vm_temp[j].cpu_usage = vm_temp[i].cpu_usage;
+ 						}
+ 					}
+ 				}
+ 				//assigning cpu weights
+ 				for(i = 0; i < num_of_vms; i++)
+ 				{
+ 					vm_temp[i].cpu_weight = i+1;
+ 				}
+ 				//sorting acc. to memory usage
+ 				for(i = 0; i < num_of_vms - 1; i++)
+ 				{
+ 					for(j = i; j < num_of_vms; j++)
+ 					{
+ 						if(vm_temp[i].mem_usage > vm_temp[j].mem_usage)
+ 						{
+ 							temp = vm_temp[i].mem_usage;
+ 							vm_temp[i].mem_usage = vm_temp[j].mem_usage;
+ 							vm_temp[j].mem_usage = vm_temp[i].mem_usage;
+ 						}
+ 					}
+ 				}
+ 				//assigning memory weights
+ 				for(i = 0; i < num_of_vms; i++)
+ 				{
+ 					vm_temp[i].mem_weight = i+1;
+ 					vm_temp[i].total_weight = vm_temp[i].cpu_weight + vm_temp[i].mem_weight;
+ 				}
+ 				//sorting acc. to total_weight
+ 				for(i = 0; i < num_of_vms - 1; i++)
+ 				{
+ 					for(j = i; j < num_of_vms; j++)
+ 					{
+ 						if(vm_temp[i].total_weight > vm_temp[j].total_weight)
+ 						{
+ 							temp = vm_temp[i].total_weight;
+ 							vm_temp[i].total_weight = vm_temp[j].total_weight;
+ 							vm_temp[j].total_weight = vm_temp[i].total_weight;
+ 						}
+ 					}
+ 				}
+ 				//choosing the middle VM in the new order
+ 				VirtualMachine selected_vm = vm_temp[num_of_vms / 2];
+ 				JOptionPane.showMessageDialog(null,"Selected VM from server "+ID+" => "+selected_vm.vma_name);
  			}
  		}
  	}

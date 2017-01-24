@@ -11,6 +11,7 @@ public class VirtualMachine
 	int VMID,SMAID;
 	String vma_name;
 	int cpu_weight, mem_weight, total_weight;
+	double cpu_usage, mem_usage;
 	JTextArea logTextArea;
 
 	public VirtualMachine(int local_id,int server_id,String vma_name,int cpu_capacity,int mem_capacity, JTextArea logTextArea)
@@ -56,7 +57,6 @@ public class VirtualMachine
 		new java.util.Timer().schedule(new java.util.TimerTask(){
 			public void run()
 			{
-				// JOptionPane.showMessageDialog(null,"Execution of VM "+vma_name+" completed");			
 				logTextArea.append("\nExecution of VM "+vma_name+" completed");
 				cpu_occupied = 0;
 				mem_occupied = 0;
