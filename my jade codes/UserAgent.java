@@ -10,15 +10,16 @@ import java.util.*;
 public class UserAgent extends Agent
 {
 	int sma_count = 12;
+	int req_no = 0;
 	public void setup()
 	{	
 		addBehaviour(new UserAgentGUI());
 		automateRequests();
 	}
 	
-	public void sendRequest(int cpureq,int memreq, int exectime, int extra_cpu, int extra_mem)
+	public void sendRequest(int req_no, int cpureq,int memreq, int exectime, int extra_cpu, int extra_mem)
 	{
-		VMRequest vmrequest = new VMRequest(cpureq, memreq, exectime, extra_cpu, extra_mem);
+		VMRequest vmrequest = new VMRequest(req_no, cpureq, memreq, exectime, extra_cpu, extra_mem);
 		try
 		{
 			jade.wrapper.AgentContainer agentContainer = getContainerController();
@@ -101,7 +102,7 @@ public class UserAgent extends Agent
 						ex.printStackTrace();
 					}*/
 
-					sendRequest(cpureq,memreq,exectime, extra_cpu, extra_mem);
+					sendRequest(++req_no,cpureq,memreq,exectime, extra_cpu, extra_mem);
 				}
 
 			});
@@ -150,7 +151,7 @@ public class UserAgent extends Agent
 					int cpureq, memreq, exectime, timelapse, req_no, extracpu, extramem;
 					for(int i=1;i<=10;i++)
 					{
-						req_no = i;
+						req_no++;
 						cpureq = random.nextInt(8) + 1;
 						memreq = random.nextInt(20) + 1;
 						exectime = random.nextInt(10) + 1;
@@ -212,7 +213,7 @@ public class UserAgent extends Agent
 		}
 		public void onWake()
 		{
-			sendRequest(cpureq, memreq, exectime, extracpu, extramem);
+			sendRequest(req_no, cpureq, memreq, exectime, extracpu, extramem);
 			textArea.append("\nRequest no: "+req_no+" --> cpu: "+cpureq+" mem: "+memreq+" exectime: "+exectime);
 		}
 	}

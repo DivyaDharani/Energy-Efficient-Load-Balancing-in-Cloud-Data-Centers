@@ -42,6 +42,7 @@ public class FrontEndAgent extends Agent
 								VMCluster vmcluster2 = new VMCluster();
 								VirtualMachine vm;
 
+								String str0 = "Request ID : "+vmrequest.req_id+"\n";
 								//filtering the vms that are incapable of fulfilling the request and that are busy
 								String str1 = "Chosen Cluster:\n", str2 = "VMs in the cluster after filtering:\n";
 								String free_vms_str="\nVMs that are free:\n";
@@ -115,7 +116,7 @@ public class FrontEndAgent extends Agent
 								}	
 								
 								VirtualMachine selectedvm = vmcluster2.get(min);
-								//dummy
+							
 								String str4 = "\nVMs in the order of Mem capacity:\n";
 								for(i=0;i<n;i++)
 								{
@@ -142,6 +143,7 @@ public class FrontEndAgent extends Agent
 					}
 					catch(Exception e)
 					{
+						System.out.println("\nError for VM request "+vmrequest.req_id);
 						e.printStackTrace();
 					}
 				}

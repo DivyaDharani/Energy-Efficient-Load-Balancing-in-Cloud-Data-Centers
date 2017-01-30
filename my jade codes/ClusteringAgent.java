@@ -4,6 +4,8 @@ import jade.lang.acl.*;
 import java.util.*;
 import javax.swing.*;
 import jade.wrapper.*;
+import java.io.*; 
+
 public class ClusteringAgent extends Agent
 {
 	int sma = 12;
@@ -161,7 +163,7 @@ public class ClusteringAgent extends Agent
 			System.out.println(str);
 			System.out.println();*/
 		
-			String str = "Cluster Information";
+			String str = "CLUSTER INFORMATION:";
 			for(int i=0;i<k;i++)
 			{
 				str+="\nCluster "+(i+1)+":";
@@ -172,8 +174,18 @@ public class ClusteringAgent extends Agent
 				str += "\tElements: "+vmcluster[i].getClusterLength()+"\tCentroid: ("+vmcluster[i].xcentroid+","+vmcluster[i].ycentroid+")";
 			}
 			JOptionPane.showMessageDialog(null,str);
-			System.out.println(str);
-			System.out.println();
+			System.out.println(str+"\n");
+			try
+			{
+				File file = new File("logfile.txt");
+				FileWriter fw = new FileWriter(file, true);
+				fw.write("\n"+str+"\n");
+				fw.close();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		void collectDetails()
 		{
