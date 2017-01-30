@@ -148,7 +148,7 @@ public class UserAgent extends Agent
 					frame.setSize(500,500);
 					frame.setVisible(true);
 					Random random = new Random();
-					int cpureq, memreq, exectime, timelapse, req_no, extracpu, extramem;
+					int cpureq, memreq, exectime, timelapse, extracpu, extramem;
 					for(int i=1;i<=10;i++)
 					{
 						req_no++;

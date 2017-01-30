@@ -57,7 +57,7 @@ public class VirtualMachine
 		new java.util.Timer().schedule(new java.util.TimerTask(){
 			public void run()
 			{
-				logTextArea.append("\nExecution of VM "+vma_name+" completed");
+				logTextArea.append("\nExecution of VM "+vma_name+" for request ID : "+vmrequest.req_id+" completed");
 				cpu_occupied = 0;
 				mem_occupied = 0;
 				status = VirtualMachine.FREE;

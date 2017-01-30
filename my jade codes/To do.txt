@@ -4,3 +4,5 @@ execution completed message should not come for vm which needs migration (merge 
 display job execution logs in different colors(one color for server, another for vm and so on)
 
 include request no. in vm execution completion messages
+
+search in other clusters if the cluster chosen has no sufficient VMs satisfying the given request
