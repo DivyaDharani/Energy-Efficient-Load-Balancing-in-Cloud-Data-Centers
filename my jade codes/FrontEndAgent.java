@@ -42,10 +42,12 @@ public class FrontEndAgent extends Agent
 								VMCluster vmcluster2 = new VMCluster();
 								VirtualMachine vm;
 
-								String str0 = "Request ID : "+vmrequest.req_id+"\n";
+								String free_vms_str, str0, str1, str2, str3, str4, str5;
+								str0 = "Request ID : "+vmrequest.req_id+"\n";
 								//filtering the vms that are incapable of fulfilling the request and that are busy
-								String str1 = "Chosen Cluster:\n", str2 = "VMs in the cluster after filtering:\n";
-								String free_vms_str="\nVMs that are free:\n";
+								str1 = "Chosen Cluster:\n";
+								str2 = "VMs in the cluster after filtering:\n";
+								free_vms_str="\nVMs that are free:\n";
 								for(i=0;i<vmcluster.getClusterLength();i++)
 								{	
 									vm = vmcluster.get(i);
@@ -82,8 +84,7 @@ public class FrontEndAgent extends Agent
 									vmcluster2.get(i).cpu_weight = i;
 								}	
 
-								//dummy
-								String str3 = "\nVMs in the order of CPU capacity:\n";
+								str3 = "\nVMs in the order of CPU capacity:\n";
 								for(i=0;i<n;i++)
 								{
 									str3 += "("+vmcluster2.get(i).cpu_capacity+","+vmcluster2.get(i).mem_capacity+")";
@@ -114,17 +115,27 @@ public class FrontEndAgent extends Agent
 									if(vmcluster2.get(i).total_weight < vmcluster2.get(min).total_weight)
 										min = i;
 								}	
-								
-								VirtualMachine selectedvm = vmcluster2.get(min);
-							
-								String str4 = "\nVMs in the order of Mem capacity:\n";
+								str4 = "\nVMs in the order of Mem capacity:\n";
 								for(i=0;i<n;i++)
 								{
 									str4 += "("+vmcluster2.get(i).cpu_capacity+","+vmcluster2.get(i).mem_capacity+")";
 								}
+								VirtualMachine selectedvm = null;
+								try
+								{
+									selectedvm = vmcluster2.get(min);
 
-								String str5 = "\nRequested Virtual Machine : ("+vmrequest.cpu_capacity+","+vmrequest.mem_capacity+")"+"\nVirtual Machine selected: ("+selectedvm.cpu_capacity+","+selectedvm.mem_capacity+")"+" ["+selectedvm.vma_name+"]";
-								String print_string = str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5;
+									str5 = "\nRequested Virtual Machine : ("+vmrequest.cpu_capacity+","+vmrequest.mem_capacity+")"+"\nVirtual Machine selected: ("+selectedvm.cpu_capacity+","+selectedvm.mem_capacity+")"+" ["+selectedvm.vma_name+"]";
+									//running the selected virtual machine
+									selectedvm.runMachine(vmrequest);
+								}
+								catch(Exception ex)
+								{
+									System.out.println("\nError for VM request "+vmrequest.req_id);
+									ex.printStackTrace();
+									str5 = "\nRequested Virtual Machine : ("+vmrequest.cpu_capacity+","+vmrequest.mem_capacity+")"+"\nRequested job could not be allocated";
+								}
+								String print_string = str0+"\n"+str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5;
 								// JOptionPane.showMessageDialog(null,str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5);
 								// System.out.println(print_string);
 								File file = new File("logfile.txt");
@@ -133,9 +144,6 @@ public class FrontEndAgent extends Agent
 								fw.write("\n"+new Date()+"\n"+print_string);
 								fw.close();
 
-								//running the selected virtual machine
-								selectedvm.runMachine(vmrequest);
-
 								break;
 							}
 						}
@@ -143,7 +151,6 @@ public class FrontEndAgent extends Agent
 					}
 					catch(Exception e)
 					{
-						System.out.println("\nError for VM request "+vmrequest.req_id);
 						e.printStackTrace();
 					}
 				}
