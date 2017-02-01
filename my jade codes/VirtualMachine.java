@@ -43,6 +43,16 @@ public class VirtualMachine
 					//no migration required
 					cpu_occupied += vmrequest.extra_cpu;
 					mem_occupied += vmrequest.extra_mem;
+					new java.util.Timer().schedule(new java.util.TimerTask(){
+						public void run()
+						{
+							logTextArea.append("\nExecution of VM "+vma_name+" for request ID : "+vmrequest.req_id+" completed");
+							cpu_occupied = 0;
+							mem_occupied = 0;
+							status = VirtualMachine.FREE;
+						}
+					}, (int)(vmrequest.exec_time * 0.25 * 1000));
+
 				} 
 				else
 				{
@@ -54,14 +64,6 @@ public class VirtualMachine
 
 		int extra_mem = vmrequest.extra_mem;
 
-		new java.util.Timer().schedule(new java.util.TimerTask(){
-			public void run()
-			{
-				logTextArea.append("\nExecution of VM "+vma_name+" for request ID : "+vmrequest.req_id+" completed");
-				cpu_occupied = 0;
-				mem_occupied = 0;
-				status = VirtualMachine.FREE;
-			}
-		}, vmrequest.exec_time * 1000); 
+		 
 	}
 }
