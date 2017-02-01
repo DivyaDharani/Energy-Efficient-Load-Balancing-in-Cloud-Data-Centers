@@ -8,3 +8,5 @@ display job execution logs in different colors(one color for server, another for
 done -> include request no. in vm execution completion messages
 
 Server selection for migration
+
+problem in VMA - clustering request sent;but no reply
