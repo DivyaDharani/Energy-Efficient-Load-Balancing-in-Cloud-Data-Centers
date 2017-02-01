@@ -238,7 +238,7 @@ public class ServerManagerAgent extends Agent
  				}
  				//choosing the middle VM in the new order
  				VirtualMachine selected_vm = vm_temp[num_of_vms / 2];
- 				JOptionPane.showMessageDialog(null,"Selected VM from server "+ID+" => "+selected_vm.vma_name);
+ 				JOptionPane.showMessageDialog(null,"Selected VM from server "+ID+" for migration => "+selected_vm.vma_name);
  			}
  		}
  	}

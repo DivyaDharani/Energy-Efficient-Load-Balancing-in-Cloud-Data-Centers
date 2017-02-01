@@ -7,13 +7,15 @@ public class VirtualMachineAgent extends Agent
 {
 	// VirtualMachine[] vms = new VirtualMachine[12];
 
-	public int ID,localID,serverID=1;
+	public int ID,localID,serverID;
+	public String vma_name;
 	public int cpu_capacity,mem_capacity;
 	public int status = 0; //0 for free; 1 for busy
 	public VirtualMachine vminstance;
 	public JTextArea logTextArea;
 	public void setup()
 	{
+		vma_name = getLocalName();
 		Object[] args = getArguments();
 		if(args!=null)
 		{
@@ -41,6 +43,7 @@ public class VirtualMachineAgent extends Agent
 			e.printStackTrace();
 		}
 		addBehaviour(new RequestGetter());
+		addBehaviour(new Migration());
 	}
 
 	class RequestGetter extends CyclicBehaviour
@@ -70,6 +73,56 @@ public class VirtualMachineAgent extends Agent
 					e.printStackTrace();
 				}
 			}	
+		}
+	}
+
+	class Migration extends CyclicBehaviour
+	{
+		public void action()
+		{
+			//monitoring continuously to check if migration has to be started for the corresponding VM
+			if(vminstance.startMigration == true)
+			{
+				//do migration
+				try
+				{
+					int req_id = 0;
+					int cpu_capacity = vminstance.cpu_occupied + vminstance.extra_cpu_needed;
+					int mem_capacity = vminstance.mem_occupied + vminstance.extra_mem_needed;
+					int exec_time = vminstance.exec_time;
+					int extra_cpu = 0;
+					int extra_mem = 0;
+					VMRequest vmrequest = new VMRequest(req_id, cpu_capacity, mem_capacity, exec_time, extra_cpu, extra_mem);
+					vmrequest.reply_to = vma_name;
+					jade.wrapper.AgentContainer agentContainer = getContainerController();
+					AgentController agentController = agentContainer.getAgent("ca");					
+					agentController.putO2AObject(vmrequest,false);
+
+					System.out.println("Clustering request sent by "+vma_name+" for selecting server for migration");
+					//getting the response from CA
+					Object obj;
+					while(true)
+					{
+						while((obj = getO2AObject()) == null)
+							;
+						if(obj.getClass().getSimpleName().equals("VMCluster"))
+						{
+							VMCluster vmcluster = (VMCluster)obj;
+							System.out.println("Cluster received to "+vma_name+" for migration");
+							break; //expected object received
+						}
+					}
+					//process the cluster
+					//select server for migration by checking the vms if they are free and by checking if migration would exceed server threshold in which the concerned VM lies  
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+
+
+ 
+			} 
 		}
 	}
 } 

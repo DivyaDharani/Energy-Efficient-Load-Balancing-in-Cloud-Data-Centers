@@ -252,7 +252,7 @@ public class ClusteringAgent extends Agent
 				try
 				{
 					jade.wrapper.AgentContainer agentContainer = getContainerController();
-					AgentController agentController = agentContainer.getAgent("fa");
+					AgentController agentController = agentContainer.getAgent(vmrequest.reply_to); //sending the response to the agent mentioned in 'vmrequest.reply_to' string parameter
 					agentController.putO2AObject(vmcluster,false);
 				}
 				catch(Exception e)

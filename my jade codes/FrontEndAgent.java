@@ -27,6 +27,7 @@ public class FrontEndAgent extends Agent
 					VMRequest vmrequest = (VMRequest)obj;
 					try
 					{
+						vmrequest.reply_to = "fa"; //reply should be sent back to FA
 						jade.wrapper.AgentContainer agentContainer = getContainerController();
 						AgentController agentController = agentContainer.getAgent("ca");
 						agentController.putO2AObject(vmrequest,false);

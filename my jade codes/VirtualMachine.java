@@ -1,5 +1,8 @@
 import java.util.*;
 import javax.swing.*;
+import jade.core.*;
+import jade.wrapper.*;
+
 public class VirtualMachine
 {
 	int local_id,server_id;
@@ -13,6 +16,8 @@ public class VirtualMachine
 	int cpu_weight, mem_weight, total_weight;
 	double cpu_usage, mem_usage;
 	JTextArea logTextArea;
+	boolean startMigration = false;
+	int exec_time, extra_cpu_needed, extra_mem_needed;
 
 	public VirtualMachine(int local_id,int server_id,String vma_name,int cpu_capacity,int mem_capacity, JTextArea logTextArea)
 	{
@@ -29,6 +34,9 @@ public class VirtualMachine
 		status = VirtualMachine.BUSY;
 		cpu_occupied = vmrequest.cpu_capacity;
 		mem_occupied = vmrequest.mem_capacity;
+		extra_cpu_needed = vmrequest.extra_cpu;
+		extra_mem_needed = vmrequest.extra_mem;
+		exec_time = vmrequest.exec_time;
 
 		final int extra_cpu_available = cpu_capacity - cpu_occupied;
 		final int extra_mem_available = mem_capacity - mem_occupied;
@@ -37,12 +45,14 @@ public class VirtualMachine
 		new java.util.Timer().schedule(new java.util.TimerTask(){
 			public void run()
 			{
-				logTextArea.append("\n"+new Date()+" -> Extra resource (Virtual Cores = "+vmrequest.extra_cpu+"; Memory = "+vmrequest.extra_mem+") - needed by VM "+vma_name);
-				if(vmrequest.extra_cpu <= extra_cpu_available && vmrequest.extra_mem <= extra_mem_available)
+				logTextArea.append("\n"+new Date()+" -> Extra resource (Virtual Cores = "+extra_cpu_needed+"; Memory = "+extra_mem_needed+") - needed by VM "+vma_name);
+				if(extra_cpu_needed <= extra_cpu_available && extra_mem_needed <= extra_mem_available)
 				{	
 					//no migration required
-					cpu_occupied += vmrequest.extra_cpu;
-					mem_occupied += vmrequest.extra_mem;
+					cpu_occupied += extra_cpu_needed;
+					mem_occupied += extra_mem_needed;
+					extra_cpu_needed = 0;
+					extra_mem_needed = 0;
 					new java.util.Timer().schedule(new java.util.TimerTask(){
 						public void run()
 						{
@@ -51,19 +61,18 @@ public class VirtualMachine
 							mem_occupied = 0;
 							status = VirtualMachine.FREE;
 						}
-					}, (int)(vmrequest.exec_time * 0.25 * 1000));
+					}, (int)(exec_time * 0.25 * 1000));
 
 				} 
 				else
 				{
 					//migration needed
+					startMigration = true;
 					logTextArea.append("\n"+new Date()+" -> MIGRATION TO BE TRIGGERED FOR "+vma_name);
+					//remaining execution time
+					exec_time = exec_time - (int)(exec_time * 0.75 * 1000);
 				}
 			}
-		}, (int)(vmrequest.exec_time * 0.75 * 1000)); 
-
-		int extra_mem = vmrequest.extra_mem;
-
-		 
+		}, (int)(exec_time * 0.75 * 1000)); 
 	}
 }

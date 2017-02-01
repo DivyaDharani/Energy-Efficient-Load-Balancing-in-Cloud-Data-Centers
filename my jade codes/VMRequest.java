@@ -6,7 +6,7 @@ public class VMRequest
 	int exec_time;
 	int extra_cpu;
 	int extra_mem;
-
+	String reply_to = "";
 	public VMRequest(int req_id, int cpu_capacity, int mem_capacity, int exec_time, int extra_cpu, int extra_mem)
 	{
 		this.req_id = req_id;
