@@ -11,6 +11,7 @@ search in other clusters if the cluster chosen has no sufficient VMs satisfying 
 
 display job execution logs in different colors(one color for server, another for vm and so on)
 
-Server selection for migration
+=>Server selection for migration
+=>find some ways to access server's parameters like load percentage through VM available in VMCluster
 
 while monitoring threshold continuously, make sure it doesn't exceed the activation count repeatedly just because we are monitoring continuously
