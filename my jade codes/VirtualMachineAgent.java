@@ -115,11 +115,28 @@ public class VirtualMachineAgent extends Agent
 					}
 					//process the cluster
 					//select server for migration by checking the vms if they are free and by checking if migration would exceed server threshold in which the concerned VM lies  
-					
+					/*int n = vmcluster.getClusterLength();
+					VirtualMachine[] vm = new VirtualMachine[n];
+					VirtualMachine tempvm;
+					int count = 0; 
+					for(int i = 0; i < n; i++)
+					{
+						tempvm = vmcluster.get(i);
+						//checking status to see if the VM is busy/free and if it's able to allocate the required amount of CPU and memory for the job
+						if(vm.status == VirtualMachine.FREE && vm.cpu_capacity >= vmrequest.cpu_capacity && vm.mem_capacity >= vmrequest.mem_capacity)
+						{
+							vm[count++] = vm;
+							//check if the load of the server of this VM exceeds the threshold or not
+							
+						}  
+					}*/
+
 					//do migration
 
+					//if migration is successful
 					//after migration
 					vminstance.startMigration = false;
+					vminstance.status = VirtualMachine.FREE; //after migration, this VM will be free since job is ported to some other VM in some other server
 				}
 				catch(Exception e)
 				{

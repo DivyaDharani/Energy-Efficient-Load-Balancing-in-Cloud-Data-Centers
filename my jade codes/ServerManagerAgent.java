@@ -30,10 +30,12 @@ public class ServerManagerAgent extends Agent
 
  	public void calculateLoad()
  	{
+ 		cpu_load = 0;
+ 		mem_load = 0;
  		for(int i = 0; i < num_of_vms; i++)
  		{
- 			cpu_load = vm[i].cpu_occupied; //total load of all VMs
- 			mem_load = vm[i].mem_occupied;
+ 			cpu_load += vm[i].cpu_occupied; //total load of all VMs
+ 			mem_load += vm[i].mem_occupied;
  			cpu_load_percentage = (cpu_load / total_cpu) * 100;
  			mem_load_percentage = (mem_load / total_mem) * 100;
  		}

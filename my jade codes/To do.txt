@@ -1,13 +1,16 @@
-index out of bound exception in FrontEndAgent.java => VirtualMachine selectedvm = vmcluster2.get(min);(116)
-search in other clusters if the cluster chosen has no sufficient VMs satisfying the given request
-
 done -> execution completed message should not come for vm which needs migration (merge two timers)
-
-display job execution logs in different colors(one color for server, another for vm and so on)
 
 done -> include request no. in vm execution completion messages
 
+done - problem in VMA - clustering request sent;but no reply
+
+done - after migration , make the VM (from which the job is taken) FREE -> status = VirtualMachine.FREE 
+
+index out of bound exception in FrontEndAgent.java => VirtualMachine selectedvm = vmcluster2.get(min);(116)
+search in other clusters if the cluster chosen has no sufficient VMs satisfying the given request
+
+display job execution logs in different colors(one color for server, another for vm and so on)
 
 Server selection for migration
 
-done - problem in VMA - clustering request sent;but no reply
+while monitoring threshold continuously, make sure it doesn't exceed the activation count repeatedly just because we are monitoring continuously
