@@ -15,6 +15,7 @@ public class VirtualMachineAgent extends Agent
 	public JTextArea logTextArea;
 	public void setup()
 	{
+		setEnabledO2ACommunication(true,0);
 		vma_name = getLocalName();
 		Object[] args = getArguments();
 		if(args!=null)
@@ -114,6 +115,11 @@ public class VirtualMachineAgent extends Agent
 					}
 					//process the cluster
 					//select server for migration by checking the vms if they are free and by checking if migration would exceed server threshold in which the concerned VM lies  
+					
+					//do migration
+
+					//after migration
+					vminstance.startMigration = false;
 				}
 				catch(Exception e)
 				{
