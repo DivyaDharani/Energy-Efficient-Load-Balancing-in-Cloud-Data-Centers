@@ -6,12 +6,14 @@ done - problem in VMA - clustering request sent;but no reply
 
 done - after migration , make the VM (from which the job is taken) FREE -> status = VirtualMachine.FREE 
 
-index out of bound exception in FrontEndAgent.java => VirtualMachine selectedvm = vmcluster2.get(min);(116)
-search in other clusters if the cluster chosen has no sufficient VMs satisfying the given request
+=>index out of bound exception in FrontEndAgent.java => VirtualMachine selectedvm = vmcluster2.get(min);(116)
 
-display job execution logs in different colors(one color for server, another for vm and so on)
+=>search in other clusters if the cluster chosen has no sufficient VMs satisfying the given request
+
+=>display job execution logs in different colors(one color for server, another for vm and so on)
 
 =>Server selection for migration
 =>find some ways to access server's parameters like load percentage through VM available in VMCluster
+=>In SMA - Respond to ACLMessage by sending server machine instance to VMA
 
-while monitoring threshold continuously, make sure it doesn't exceed the activation count repeatedly just because we are monitoring continuously
+=>while monitoring threshold continuously, make sure it doesn't exceed the activation count repeatedly just because we are monitoring continuously

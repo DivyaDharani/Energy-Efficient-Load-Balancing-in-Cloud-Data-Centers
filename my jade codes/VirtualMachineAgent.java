@@ -102,34 +102,53 @@ public class VirtualMachineAgent extends Agent
 					System.out.println("Clustering request sent by "+vma_name+" for selecting server for migration");
 					//getting the response from CA
 					Object obj;
+					VMCluster vmcluster;
 					while(true)
 					{
 						while((obj = getO2AObject()) == null)
 							;
 						if(obj.getClass().getSimpleName().equals("VMCluster"))
 						{
-							VMCluster vmcluster = (VMCluster)obj;
+							vmcluster = (VMCluster)obj;
 							System.out.println("Cluster received to "+vma_name+" for migration");
 							break; //expected object received
 						}
 					}
 					//process the cluster
 					//select server for migration by checking the vms if they are free and by checking if migration would exceed server threshold in which the concerned VM lies  
-					/*int n = vmcluster.getClusterLength();
-					VirtualMachine[] vm = new VirtualMachine[n];
-					VirtualMachine tempvm;
+					int n = vmcluster.getClusterLength();
+					VirtualMachine[] vm_array = new VirtualMachine[n];
+					VirtualMachine vm;
 					int count = 0; 
 					for(int i = 0; i < n; i++)
 					{
-						tempvm = vmcluster.get(i);
+						vm = vmcluster.get(i);
 						//checking status to see if the VM is busy/free and if it's able to allocate the required amount of CPU and memory for the job
 						if(vm.status == VirtualMachine.FREE && vm.cpu_capacity >= vmrequest.cpu_capacity && vm.mem_capacity >= vmrequest.mem_capacity)
 						{
-							vm[count++] = vm;
-							//check if the load of the server of this VM exceeds the threshold or not
-							
+							vm_array[count++] = vm;
+						 	//requesting for ServerMachine instance of this VM
+						 	ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+						 	msg.setOntology("requesting-for-server-machine-instance");
+						 	msg.addReceiver(new AID("sma"+vm.server_id,AID.ISLOCALNAME));
+						 	send(msg);
+						 	//getting the ServerMachine object
+						 	ServerMachine serverMachine = null;
+						 	while((obj = getO2AObject()) == null)
+						 		;
+						 	if(obj.getClass().getSimpleName().equals("ServerMachine"))
+						 	{
+						 		serverMachine = (ServerMachine)serverMachine;
+						 		System.out.println("ServerMachine instance - received to "+vma_name);
+						 		//check the load level when this server takes up the job to see if it exceeds the threshold
+
+						 	}
+						 	else
+						 	{
+						 		System.out.println("Some other object is received in place of ServerMachine to VMA "+vma_name);
+						 	}
 						}  
-					}*/
+					}
 
 					//do migration
 

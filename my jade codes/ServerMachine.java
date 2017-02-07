@@ -12,5 +12,4 @@ public class ServerMachine
 		this.total_cpu = total_cpu;
 		this.total_mem = total_mem;
 	}
-
 }
