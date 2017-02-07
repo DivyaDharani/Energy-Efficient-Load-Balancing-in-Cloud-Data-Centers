@@ -13,6 +13,7 @@ public class ServerManagerAgent extends Agent
 	int cpu_load, mem_load, cpu_load_activation_threshold, mem_load_activation_threshold, cpu_load_activation_count, mem_load_activation_count;
 	double cpu_load_percentage, mem_load_percentage, cpu_load_threshold_percentage, mem_load_threshold_percentage; 
 	VirtualMachine[] vm; 
+	ServerMachine serverMachine;
 	public void setup()
 	{
 		setEnabledO2ACommunication(true,0);
@@ -26,6 +27,7 @@ public class ServerManagerAgent extends Agent
 		addBehaviour(new RequestGetter());
 		addBehaviour(new TriggerThresholdMonitoring());
 		
+		serverMachine = new ServerMachine(ID, num_of_vms, total_cpu, total_mem);
  	}
 
  	public void calculateLoad()
@@ -38,6 +40,11 @@ public class ServerManagerAgent extends Agent
  			mem_load += vm[i].mem_occupied;
  			cpu_load_percentage = (cpu_load / total_cpu) * 100;
  			mem_load_percentage = (mem_load / total_mem) * 100;
+
+ 			serverMachine.cpu_load = cpu_load;
+ 			serverMachine.mem_load = mem_load;
+ 			serverMachine.cpu_load_percentage = cpu_load_percentage;
+ 			serverMachine.mem_load_percentage = mem_load_percentage;
  		}
  	}
 
