@@ -13,7 +13,7 @@ done - after migration , make the VM (from which the job is taken) FREE -> statu
 =>display job execution logs in different colors(one color for server, another for vm and so on)
 
 =>Server selection for migration
-=>find some ways to access server's parameters like load percentage through VM available in VMCluster
-=>In SMA - Respond to ACLMessage by sending server machine instance to VMA
+done - find some ways to access server's parameters like load percentage through VM available in VMCluster
+done - In SMA - Respond to ACLMessage by sending server machine instance to VMA
 
 =>while monitoring threshold continuously, make sure it doesn't exceed the activation count repeatedly just because we are monitoring continuously
