@@ -28,6 +28,7 @@ public class ServerManagerAgent extends Agent
 		addBehaviour(new TriggerThresholdMonitoring());
 		
 		serverMachine = new ServerMachine(ID, num_of_vms, total_cpu, total_mem);
+		addBehaviour(new ServerMachineProvider());
  	}
 
  	public void calculateLoad()
@@ -250,5 +251,27 @@ public class ServerManagerAgent extends Agent
  				JOptionPane.showMessageDialog(null,"Selected VM from server "+ID+" for migration => "+selected_vm.vma_name);
  			}
  		}
+ 	}
+
+ 	public class ServerMachineProvider extends CyclicBehaviour
+ 	{
+ 		public void action()
+ 		{
+			MessageTemplate msgtemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),MessageTemplate.MatchOntology("requesting-for-server-machine-instance"));
+			ACLMessage msg = receive(msgtemplate);
+			if(msg != null)
+			{ 		
+				try
+				{
+					jade.wrapper.AgentContainer agentContainer = getContainerController();
+					AgentController agentController = agentContainer.getAgent(msg.getSender().getLocalName()); 
+					agentController.putO2AObject(serverMachine, false);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
  	}
 }
