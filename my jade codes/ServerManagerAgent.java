@@ -39,8 +39,8 @@ public class ServerManagerAgent extends Agent
  		{
  			cpu_load += vm[i].cpu_occupied; //total load of all VMs
  			mem_load += vm[i].mem_occupied;
- 			cpu_load_percentage = (cpu_load / total_cpu) * 100;
- 			mem_load_percentage = (mem_load / total_mem) * 100;
+ 			cpu_load_percentage = ((1.0 * cpu_load) / total_cpu) * 100;
+ 			mem_load_percentage = ((1.0 * mem_load) / total_mem) * 100;
 
  			serverMachine.cpu_load = cpu_load;
  			serverMachine.mem_load = mem_load;

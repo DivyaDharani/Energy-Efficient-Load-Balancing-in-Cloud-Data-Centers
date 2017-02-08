@@ -138,10 +138,14 @@ public class VirtualMachineAgent extends Agent
 						 		;
 						 	if(obj.getClass().getSimpleName().equals("ServerMachine"))
 						 	{
-						 		serverMachine = (ServerMachine)serverMachine;
+						 		serverMachine = (ServerMachine)obj;
 						 		System.out.println("ServerMachine instance - received to "+vma_name);
 						 		//check the load level when this server takes up the job to see if it exceeds the threshold
-
+						 		int cpu_load = serverMachine.cpu_load + vmrequest.cpu_capacity;
+						 		int mem_load = serverMachine.mem_load + vmrequest.mem_capacity;
+						 		double cpu_load_percentage = ((1.0 * cpu_load) / serverMachine.total_cpu) * 100;
+						 		double mem_load_percentage = ((1.0 * mem_load) / serverMachine.total_mem) * 100;
+						 		//collect the loads of the servers of all the potential VMs and choose the best server as host 
 						 	}
 						 	else
 						 	{
