@@ -85,6 +85,7 @@ public class VirtualMachineAgent extends Agent
 			if(vminstance.startMigration == true)
 			{
 				//do migration
+				int dummy = -1;
 				try
 				{
 					int req_id = 0;
@@ -135,13 +136,17 @@ public class VirtualMachineAgent extends Agent
 						 	msg.setOntology("requesting-for-server-machine-instance");
 						 	msg.addReceiver(new AID("sma"+vm.server_id,AID.ISLOCALNAME));
 						 	send(msg);
+
+						 	dummy = -2;
+
 						 	//getting the ServerMachine object
 						 	while((obj = getO2AObject()) == null)
 						 		;
 						 	if(obj.getClass().getSimpleName().equals("ServerMachine"))
 						 	{
+						 		dummy = -3;
 						 		serverMachines[count] = (ServerMachine)obj;
-						 		System.out.println("ServerMachine instance - received to "+vma_name);
+						 		System.out.println("ServerMachine instance of "+vm.vma_name+" - received to "+vma_name);
 						 		//check the load level when this server takes up the job to see if it exceeds the threshold
 						 		int cpu_load = serverMachines[count].cpu_load + vmrequest.cpu_capacity;
 						 		int mem_load = serverMachines[count].mem_load + vmrequest.mem_capacity;
@@ -155,7 +160,7 @@ public class VirtualMachineAgent extends Agent
 						 		if(count == 0) //first potential VM's server
 						 		{
 						 			max_diff_for = count;
-						 			max_total_diff = total_diff;  
+						 			max_total_diff = total_diff;
 						 		}
 						 		else
 						 		{
@@ -163,6 +168,7 @@ public class VirtualMachineAgent extends Agent
 						 			{
 						 				max_total_diff = total_diff;
 						 				max_diff_for = count;
+						 				dummy = max_diff_for;
 						 			}
 						 		}
 						 		count++;
@@ -173,26 +179,34 @@ public class VirtualMachineAgent extends Agent
 						 	}
 						}  
 					}
-					//serverMachines[max_diff_for] gives the server; vm_array[max_diff_for] gives the VM in the selected server to which the job is to be given
-					ServerMachine selected_server = serverMachines[max_diff_for];
-					VirtualMachine selected_vm = vm_array[max_diff_for];
+					if(max_total_diff >= 0) //threshold is not exceeded
+					{				
+						//serverMachines[max_diff_for] gives the server; vm_array[max_diff_for] gives the VM in the selected server to which the job is to be given
+						ServerMachine selected_server = serverMachines[max_diff_for];
+						VirtualMachine selected_vm = vm_array[max_diff_for];
 
-					logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name);
+						logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name);
 
-					//do migration
-
-					//if migration is successful
-					//after migration
-					vminstance.startMigration = false;
-					vminstance.status = VirtualMachine.FREE; //after migration, this VM will be free since job is ported to some other VM in some other server
+						//Migration
+						if(selected_vm.status == VirtualMachine.FREE) //checking if the selected VM is still free
+						{
+							//migration can be done
+							selected_vm.runMachine(vmrequest);
+							//after migration
+							vminstance.startMigration = false;
+							vminstance.status = VirtualMachine.FREE; //after migration, this VM will be free since job is ported to some other VM in some other server
+						}
+					}
+					else
+					{
+						System.out.println("No potential server found - for migration of job from "+vma_name);
+					}
 				}
 				catch(Exception e)
 				{
+					System.out.println("Error message : \n max_diff_for = "+dummy);
 					e.printStackTrace();
 				}
-
-
- 
 			} 
 		}
 	}

@@ -16,6 +16,13 @@ done - find some ways to access server's parameters like load percentage through
 done - In SMA - Respond to ACLMessage by sending server machine instance to VMA
 
 done - Server selection for migration when VM's capacity is not sufficient for the job
+done - migration for load balancing (in the above case)
+
+=> Fix bug in 'NullPointerException' in selected_server and selected_vm variables
+=> Do necessary actions for 'No potential server found' case
+=> 'Server machine received to ...' message is the last one to appear - do necessary actions for this case
+=> remove the dummy variable in VMA.java
+
 
 => Server selection for migration when server's threshold is exceeded
 
