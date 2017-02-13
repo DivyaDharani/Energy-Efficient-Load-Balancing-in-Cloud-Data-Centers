@@ -1,6 +1,7 @@
 import java.util.*;
 public class VMCluster
 {
+	int clusterID;
 	ArrayList<VirtualMachine> cluster = new ArrayList<VirtualMachine>();
 	
 	public double xcentroid,ycentroid;

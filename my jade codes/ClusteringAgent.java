@@ -24,6 +24,7 @@ public class ClusteringAgent extends Agent
 		setEnabledO2ACommunication(true,0);
 		addBehaviour(new ClusterBehaviour());
 		addBehaviour(new RequestClustering());
+		addBehaviour(new ClusterSender());
 	}	
 
 	public class ClusterBehaviour extends OneShotBehaviour //must be cyclic behaviour or TickerBehaviour
@@ -49,6 +50,7 @@ public class ClusteringAgent extends Agent
 				/*xcentroid[i] = x[i];
 				ycentroid[i] = y[i];*/
 				vmcluster[i] = new VMCluster();
+				vmcluster[i].clusterID = i;
 				vmcluster[i].xcentroid = (vmarray.get(i)).cpu_capacity;
 				vmcluster[i].ycentroid = vmarray.get(i).mem_capacity;
 			}
@@ -283,6 +285,31 @@ public class ClusteringAgent extends Agent
 			double a = Math.pow(x2-x1,2);
 			double b = Math.pow(y2-y1,2);
 			return Math.sqrt(a+b);
+		}
+	}
+
+	class ClusterSender extends CyclicBehaviour
+	{
+		public void action()
+		{
+			MessageTemplate msgtemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),MessageTemplate.MatchOntology("requesting-for-cluster"));
+     			ACLMessage msg = receive(msgtemplate);
+      			if(msg!=null)
+      			{
+      				JOptionPane.showMessageDialog(null,"'Requesting for cluster' message - received from "+msg.getSender().getLocalName());
+      				String str = msg.getContent();
+      				int requestedClusterID = Integer.parseInt(str);
+      				try
+      				{
+      					jade.wrapper.AgentContainer agentContainer = getContainerController();
+      					AgentController agentController = agentContainer.getAgent(msg.getSender().getLocalName());
+      					agentController.putO2AObject(vmcluster[requestedClusterID], false);
+      				}
+      				catch(Exception e)
+      				{
+      					e.printStackTrace();
+      				}
+      			}
 		}
 	}
 }
