@@ -118,34 +118,54 @@ public class VirtualMachineAgent extends Agent
 					//select server for migration by checking the vms if they are free and by checking if migration would exceed server threshold in which the concerned VM lies  
 					int n = vmcluster.getClusterLength();
 					VirtualMachine[] vm_array = new VirtualMachine[n];
+					ServerMachine[] serverMachines = new ServerMachine[n];
 					VirtualMachine vm;
-					int count = 0; 
+					int count = 0, max_diff_for = 0;
+					double total_diff, max_total_diff = 0;  
 					for(int i = 0; i < n; i++)
 					{
 						vm = vmcluster.get(i);
 						//checking status to see if the VM is busy/free and if it's able to allocate the required amount of CPU and memory for the job
 						if(vm.status == VirtualMachine.FREE && vm.cpu_capacity >= vmrequest.cpu_capacity && vm.mem_capacity >= vmrequest.mem_capacity)
 						{
-							vm_array[count++] = vm;
+							//potential VM
+							vm_array[count] = vm; //'count' denotes the potential VMs' count
 						 	//requesting for ServerMachine instance of this VM
 						 	ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 						 	msg.setOntology("requesting-for-server-machine-instance");
 						 	msg.addReceiver(new AID("sma"+vm.server_id,AID.ISLOCALNAME));
 						 	send(msg);
 						 	//getting the ServerMachine object
-						 	ServerMachine serverMachine = null;
 						 	while((obj = getO2AObject()) == null)
 						 		;
 						 	if(obj.getClass().getSimpleName().equals("ServerMachine"))
 						 	{
-						 		serverMachine = (ServerMachine)obj;
+						 		serverMachines[count] = (ServerMachine)obj;
 						 		System.out.println("ServerMachine instance - received to "+vma_name);
 						 		//check the load level when this server takes up the job to see if it exceeds the threshold
-						 		int cpu_load = serverMachine.cpu_load + vmrequest.cpu_capacity;
-						 		int mem_load = serverMachine.mem_load + vmrequest.mem_capacity;
-						 		double cpu_load_percentage = ((1.0 * cpu_load) / serverMachine.total_cpu) * 100;
-						 		double mem_load_percentage = ((1.0 * mem_load) / serverMachine.total_mem) * 100;
-						 		//collect the loads of the servers of all the potential VMs and choose the best server as host 
+						 		int cpu_load = serverMachines[count].cpu_load + vmrequest.cpu_capacity;
+						 		int mem_load = serverMachines[count].mem_load + vmrequest.mem_capacity;
+						 		double cpu_load_percentage = ((1.0 * cpu_load) / serverMachines[count].total_cpu) * 100;
+						 		double mem_load_percentage = ((1.0 * mem_load) / serverMachines[count].total_mem) * 100;
+						 		double cpu_load_threshold_percentage = serverMachines[count].cpu_load_threshold_percentage;
+						 		double mem_load_threshold_percentage = serverMachines[count].mem_load_threshold_percentage;
+
+						 		//(threshold level - load) => for the best server, this diff is maximum 
+						 		total_diff = (cpu_load_threshold_percentage - cpu_load_percentage) + (mem_load_threshold_percentage - mem_load_percentage);
+						 		if(count == 0) //first potential VM's server
+						 		{
+						 			max_diff_for = count;
+						 			max_total_diff = total_diff;  
+						 		}
+						 		else
+						 		{
+						 			if(total_diff > max_total_diff)
+						 			{
+						 				max_total_diff = total_diff;
+						 				max_diff_for = count;
+						 			}
+						 		}
+						 		count++;
 						 	}
 						 	else
 						 	{
@@ -153,6 +173,11 @@ public class VirtualMachineAgent extends Agent
 						 	}
 						}  
 					}
+					//serverMachines[max_diff_for] gives the server; vm_array[max_diff_for] gives the VM in the selected server to which the job is to be given
+					ServerMachine selected_server = serverMachines[max_diff_for];
+					VirtualMachine selected_vm = vm_array[max_diff_for];
+
+					logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name);
 
 					//do migration
 
