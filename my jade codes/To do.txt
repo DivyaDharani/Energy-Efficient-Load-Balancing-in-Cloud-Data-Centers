@@ -1,28 +1,15 @@
-done -> execution completed message should not come for vm which needs migration (merge two timers)
-
-done -> include request no. in vm execution completion messages
-
-done - problem in VMA - clustering request sent;but no reply
-
-done - after migration , make the VM (from which the job is taken) FREE -> status = VirtualMachine.FREE 
-
 =>index out of bound exception in FrontEndAgent.java => VirtualMachine selectedvm = vmcluster2.get(min);(116)
 
 =>search in other clusters if the cluster chosen has no sufficient VMs satisfying the given request
 
 =>display job execution logs in different colors(one color for server, another for vm and so on)
 
-done - find some ways to access server's parameters like load percentage through VM available in VMCluster
-done - In SMA - Respond to ACLMessage by sending server machine instance to VMA
-
-done - Server selection for migration when VM's capacity is not sufficient for the job
-done - migration for load balancing (in the above case)
-
 => Fix bug in 'NullPointerException' in selected_server and selected_vm variables
 => Do necessary actions for 'No potential server found' case
 => 'Server machine received to ...' message is the last one to appear - do necessary actions for this case
 => remove the dummy variable in VMA.java
-
+=> remove unnecessary print messages
+=> ERROR IDENTIFIED => INNER LOOP IN VMA.JAVA IS NOT RUNNING UP TO n.
 
 => Server selection for migration when server's threshold is exceeded
 

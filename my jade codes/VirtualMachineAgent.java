@@ -117,9 +117,9 @@ public class VirtualMachineAgent extends Agent
 					}
 					//process the cluster
 					//select server for migration by checking the vms if they are free and by checking if migration would exceed server threshold in which the concerned VM lies  
-					int n = vmcluster.getClusterLength();
-					VirtualMachine[] vm_array = new VirtualMachine[n];
-					ServerMachine[] serverMachines = new ServerMachine[n];
+					int n;
+					VirtualMachine[] vm_array;
+					ServerMachine[] serverMachines;
 					VirtualMachine vm;
 					int count = 0, max_diff_for = 0;
 					double total_diff, max_total_diff = 0;
@@ -127,34 +127,13 @@ public class VirtualMachineAgent extends Agent
 					for(int k = 0; ;k++) //executes continuously until the loop is stopped explicitly by 'break'
 					{
 						count = 0;
-						if(k == 0) //first time
-							; 
-						else if(count == 0) //cluster received before doesn't have the required VM
-						{
-							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-							msg.setOntology("requesting-for-cluster");
-							if(vmcluster.clusterID == 2)
-								msg.setContent("0");
-							else
-								msg.setContent(""+(vmcluster.clusterID++));
-							msg.addReceiver(new AID("ca", AID.ISLOCALNAME));
-							send(msg);
-
-							while((obj = getO2AObject()) == null)
-								;
-							if(obj.getClass().getSimpleName().equals("VMCluster"))
-							{
-								vmcluster = (VMCluster)obj;
-								// System.out.println("Received VMCluster (ID:"+msg.getContent()+") by "+vma_name);
-							}
-							else
-							{
-								System.out.println("ERROR: Some other object is received to "+vma_name+" in place of VM cluster");
-							}						
-						}
-
+						n = vmcluster.getClusterLength();
+						vm_array = new VirtualMachine[n];
+						serverMachines = new ServerMachine[n];
+						System.out.println("Iteration:"+k+" and n = "+n+" for "+vma_name);
 						for(int i = 0; i < n; i++)
 						{
+							System.out.println("Inner loop iteration: "+i+" for "+vma_name);
 							vm = vmcluster.get(i);
 							//checking status to see if the VM is busy/free and if it's able to allocate the required amount of CPU and memory for the job
 							if(vm.status == VirtualMachine.FREE && vm.cpu_capacity >= vmrequest.cpu_capacity && vm.mem_capacity >= vmrequest.mem_capacity)
@@ -176,7 +155,7 @@ public class VirtualMachineAgent extends Agent
 							 	{
 							 		dummy = -3;
 							 		serverMachines[count] = (ServerMachine)obj;
-							 		// System.out.println("ServerMachine instance of "+vm.vma_name+" - received to "+vma_name);
+							 		System.out.println("ServerMachine instance of "+vm.vma_name+" - received to "+vma_name);
 							 		//check the load level when this server takes up the job to see if it exceeds the threshold
 							 		int cpu_load = serverMachines[count].cpu_load + vmrequest.cpu_capacity;
 							 		int mem_load = serverMachines[count].mem_load + vmrequest.mem_capacity;
@@ -201,37 +180,68 @@ public class VirtualMachineAgent extends Agent
 							 				dummy = max_diff_for;
 							 			}
 							 		}
-							 		count++;
 							 	}
 							 	else
 							 	{
 							 		System.out.println("Some other object is received in place of ServerMachine to VMA "+vma_name);
 							 	}
+
+							 	count ++;
 							}  
 						}
-					
-						if(max_total_diff >= 0) //threshold is not exceeded
-						{				
-							//serverMachines[max_diff_for] gives the server; vm_array[max_diff_for] gives the VM in the selected server to which the job is to be given
-							ServerMachine selected_server = serverMachines[max_diff_for];
-							VirtualMachine selected_vm = vm_array[max_diff_for];
-
-							logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name);
-
-							//Migration
-							if(selected_vm.status == VirtualMachine.FREE) //checking if the selected VM is still free
-							{
-								//migration can be done
-								selected_vm.runMachine(vmrequest);
-								//after migration
-								vminstance.startMigration = false;
-								vminstance.status = VirtualMachine.FREE; //after migration, this VM will be free since job is ported to some other VM in some other server
-							}
-						}
-						else
+						System.out.println("before if else part of "+vma_name);
+						if(count > 0) //at least one server and a VM in it are found
 						{
-							System.out.println("No potential server found - for migration of job from "+vma_name);
+							System.out.println("In count > 0 block of "+vma_name);
+							break; 
 						}
+						else //count = 0 => cluster received before doesn't have the required VM
+						{
+							System.out.println("In count 0 block of "+vma_name);
+							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+							msg.setOntology("requesting-for-cluster");
+							if(vmcluster.clusterID == 2)
+								msg.setContent("0");
+							else
+								msg.setContent(""+(vmcluster.clusterID++));
+							msg.addReceiver(new AID("ca", AID.ISLOCALNAME));
+							send(msg);
+
+							while((obj = getO2AObject()) == null)
+								;
+							if(obj.getClass().getSimpleName().equals("VMCluster"))
+							{
+								vmcluster = (VMCluster)obj;
+								System.out.println("Received VMCluster (ID:"+msg.getContent()+") by "+vma_name);
+							}
+							else
+							{
+								System.out.println("ERROR: Some other object is received to "+vma_name+" in place of VM cluster");
+								break;
+							}						
+						}
+					}
+					if(max_total_diff >= 0) //making sure the threshold is not exceeded for the best server found
+					{				
+						//serverMachines[max_diff_for] gives the server; vm_array[max_diff_for] gives the VM in the selected server to which the job is to be given
+						ServerMachine selected_server = serverMachines[max_diff_for];
+						VirtualMachine selected_vm = vm_array[max_diff_for];
+
+						logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name);
+
+						//Migration
+						if(selected_vm.status == VirtualMachine.FREE) //checking if the selected VM is still free
+						{
+							//migration can be done
+							selected_vm.runMachine(vmrequest);
+							//after migration
+							vminstance.startMigration = false;
+							vminstance.status = VirtualMachine.FREE; //after migration, this VM will be free since job is ported to some other VM in some other server
+						}
+					}
+					else
+					{
+						System.out.println("No potential server found - for migration of job from "+vma_name);
 					}
 				}
 				catch(Exception e)
