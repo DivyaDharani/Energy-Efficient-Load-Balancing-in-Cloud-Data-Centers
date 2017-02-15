@@ -4,14 +4,14 @@
 
 =>display job execution logs in different colors(one color for server, another for vm and so on)
 
-=> Fix bug in 'NullPointerException' in selected_server and selected_vm variables
-=> Do necessary actions for 'No potential server found' case
+done => Fix bug in 'NullPointerException' in selected_server and selected_vm variables
+done => Do necessary actions for 'No potential server found' case
 => 'Server machine received to ...' message is the last one to appear - do necessary actions for this case
 => remove the dummy variable in VMA.java
 => remove unnecessary print messages
 
 
-=> Server selection for migration when server's threshold is exceeded
+done => Server selection for migration when server's threshold is exceeded
 
 =>while monitoring threshold continuously, make sure it doesn't exceed the activation count repeatedly just because we are monitoring continuously
 
