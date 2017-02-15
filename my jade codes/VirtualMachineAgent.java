@@ -227,16 +227,19 @@ public class VirtualMachineAgent extends Agent
 						ServerMachine selected_server = serverMachines[max_diff_for];
 						VirtualMachine selected_vm = vm_array[max_diff_for];
 
-						logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name);
-
 						//Migration
 						if(selected_vm.status == VirtualMachine.FREE) //checking if the selected VM is still free
 						{
+							logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name);
 							//migration can be done
 							selected_vm.runMachine(vmrequest);
 							//after migration
 							vminstance.startMigration = false;
 							vminstance.status = VirtualMachine.FREE; //after migration, this VM will be free since job is ported to some other VM in some other server
+						}
+						else
+						{
+							logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name+" ----- Oops! VM is found be busy ; Cannot be allocated !!");
 						}
 					}
 					else

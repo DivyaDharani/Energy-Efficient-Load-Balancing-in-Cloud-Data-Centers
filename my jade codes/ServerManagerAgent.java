@@ -158,15 +158,14 @@ public class ServerManagerAgent extends Agent
  		public void action()
  		{
  			//threshold specific to the capacity of this server
- 			cpu_load_threshold = 0.75 * total_cpu;
- 			mem_load_threshold = 0.75 * total_mem;
+ 			serverMachine.cpu_load_threshold = cpu_load_threshold = 0.75 * total_cpu;
+ 			serverMachine.mem_load_threshold = mem_load_threshold = 0.75 * total_mem;
  			//threshold based on usage percentage => 75%
- 			cpu_load_threshold_percentage = 75;
- 			mem_load_threshold_percentage = 75;
+ 			serverMachine.cpu_load_threshold_percentage = cpu_load_threshold_percentage = 75;
+ 			serverMachine.mem_load_threshold_percentage = mem_load_threshold_percentage = 75;
 
- 			cpu_load_activation_threshold = 3;
- 			mem_load_activation_threshold = 3;
-
+ 			serverMachine.cpu_load_activation_threshold = cpu_load_activation_threshold = 3;
+ 			serverMachine.mem_load_activation_threshold = mem_load_activation_threshold = 3;
   		}
  	}
 

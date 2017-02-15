@@ -9,10 +9,11 @@
 => 'Server machine received to ...' message is the last one to appear - do necessary actions for this case
 => remove the dummy variable in VMA.java
 => remove unnecessary print messages
-=> ERROR IDENTIFIED => INNER LOOP IN VMA.JAVA IS NOT RUNNING UP TO n.
+
 
 => Server selection for migration when server's threshold is exceeded
 
 =>while monitoring threshold continuously, make sure it doesn't exceed the activation count repeatedly just because we are monitoring continuously
 
-=>line 185 in SMA.java => print the message in job execution logs
+ERRORS to be rectified:
+=> ERROR IDENTIFIED => INNER LOOP IN VMA.JAVA IS NOT RUNNING UP TO n.
