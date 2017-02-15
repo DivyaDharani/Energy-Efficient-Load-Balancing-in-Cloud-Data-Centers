@@ -296,7 +296,7 @@ public class ClusteringAgent extends Agent
      			ACLMessage msg = receive(msgtemplate);
       			if(msg!=null)
       			{
-      				JOptionPane.showMessageDialog(null,"'Requesting for cluster' message - received from "+msg.getSender().getLocalName());
+      				// JOptionPane.showMessageDialog(null,"'Requesting for cluster' message - received from "+msg.getSender().getLocalName());
       				String str = msg.getContent();
       				int requestedClusterID = Integer.parseInt(str);
       				try

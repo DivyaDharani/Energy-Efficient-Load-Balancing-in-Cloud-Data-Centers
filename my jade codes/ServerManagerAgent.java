@@ -5,7 +5,7 @@ import jade.wrapper.*;
 import javax.swing.*;
 import java.util.*;
 import java.io.*;
-
+import javax.swing.*;
 public class ServerManagerAgent extends Agent
 {
 	int ID, num_of_vms, total_cpu, total_mem;
@@ -14,6 +14,7 @@ public class ServerManagerAgent extends Agent
 	double cpu_load_percentage, mem_load_percentage, cpu_load_threshold_percentage, mem_load_threshold_percentage; 
 	VirtualMachine[] vm; 
 	ServerMachine serverMachine;
+	JTextArea logTextArea;
 	public void setup()
 	{
 		setEnabledO2ACommunication(true,0);
@@ -22,6 +23,7 @@ public class ServerManagerAgent extends Agent
 		num_of_vms = (Integer)args[1];
 		total_cpu = (Integer)args[2];
 		total_mem = (Integer)args[3];
+		logTextArea = (JTextArea)args[4];
 		vm = new VirtualMachine[num_of_vms];
 		// System.out.println(getLocalName()+" with ID "+ID+" is started.(No. of vms => "+num_of_vms+")");
 		addBehaviour(new RequestGetter());
@@ -182,7 +184,7 @@ public class ServerManagerAgent extends Agent
  			if((cpu_load_activation_count > cpu_load_activation_threshold) || (mem_load_activation_count > mem_load_activation_threshold))
  			{
  				//trigger migration 
- 				JOptionPane.showMessageDialog(null, "Migration - to be triggered for Server "+ID+" !!");
+ 				logTextArea.append("\nMIGRATION TO BE TRIGGERED FOR SERVER "+ID+" !!");
  				if(cpu_load_activation_threshold > cpu_load_activation_threshold)
  					cpu_load_activation_count = 0;
  				if(mem_load_activation_count > mem_load_activation_threshold)
@@ -248,7 +250,7 @@ public class ServerManagerAgent extends Agent
  				}
  				//choosing the middle VM in the new order
  				VirtualMachine selected_vm = vm_temp[num_of_vms / 2];
- 				JOptionPane.showMessageDialog(null,"Selected VM from server "+ID+" for migration => "+selected_vm.vma_name);
+ 				logTextArea.append("\nSelected VM from server "+ID+" for migration => "+selected_vm.vma_name);
  			}
  		}
  	}

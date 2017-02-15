@@ -14,3 +14,5 @@
 => Server selection for migration when server's threshold is exceeded
 
 =>while monitoring threshold continuously, make sure it doesn't exceed the activation count repeatedly just because we are monitoring continuously
+
+=>line 185 in SMA.java => print the message in job execution logs

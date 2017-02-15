@@ -87,7 +87,7 @@ public class AgentStarter extends Agent
 						total_mem += Integer.parseInt(memarr[t]);
 
 					//creating SMA
-					ac[inc++] = cc.createNewAgent("sma"+i,"ServerManagerAgent",new Object[]{i, num_of_vms(i), total_cpu, total_mem});//passing server's ID, no. of vms in it, and total cpu and memory capacities 
+					ac[inc++] = cc.createNewAgent("sma"+i,"ServerManagerAgent",new Object[]{i, num_of_vms(i), total_cpu, total_mem, logTextArea});//passing server's ID, no. of vms in it, and total cpu and memory capacities 
 
 					//creating VMAs of server 'i'
 					j = num_of_vms(i);
