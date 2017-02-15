@@ -148,7 +148,6 @@ public class ServerManagerAgent extends Agent
  				if(obj.getClass().getSimpleName().equals("VirtualMachine"))
  				{
  					vm[i] = (VirtualMachine)obj;
- 					System.out.println("Server "+ID+" => VM instance "+(i+1)+" received");
  				}
  			} 			
  		}
