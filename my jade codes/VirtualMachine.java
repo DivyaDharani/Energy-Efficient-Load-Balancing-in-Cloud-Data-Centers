@@ -62,15 +62,18 @@ public class VirtualMachine
 							status = VirtualMachine.FREE;
 						}
 					}, (int)(exec_time * 0.25 * 1000));
-
 				} 
 				else
 				{
 					//migration needed
-					startMigration = true;
-					logTextArea.append("\n"+new Date()+" -> MIGRATION TO BE TRIGGERED FOR "+vma_name);
-					//remaining execution time
-					exec_time = exec_time - (int)(exec_time * 0.75 * 1000);
+					//checking if migration is already triggered due to server's load
+					if(startMigration == false)
+					{
+						startMigration = true;
+						logTextArea.append("\n"+new Date()+" -> MIGRATION TO BE TRIGGERED FOR "+vma_name);
+						//remaining execution time
+						exec_time = exec_time - (int)(exec_time * 0.75 * 1000);
+					}
 				}
 			}
 		}, (int)(exec_time * 0.75 * 1000)); 

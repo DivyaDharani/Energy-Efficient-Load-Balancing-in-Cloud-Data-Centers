@@ -251,6 +251,8 @@ public class ServerManagerAgent extends Agent
  				//choosing the middle VM in the new order
  				VirtualMachine selected_vm = vm_temp[num_of_vms / 2];
  				logTextArea.append("\nSelected VM from server "+ID+" for migration => "+selected_vm.vma_name);
+ 				selected_vm.startMigration = true;
+ 				//calculate remaining execution time 
  			}
  		}
  	}
