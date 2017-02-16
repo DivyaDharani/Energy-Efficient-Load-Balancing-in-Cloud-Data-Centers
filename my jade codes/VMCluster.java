@@ -29,4 +29,22 @@ public class VMCluster
 	{
 		return cluster.size();
 	}
+	public boolean isEmpty()
+	{
+		return cluster.isEmpty();
+	}
+
+	public boolean checkAllocationPossibility(int cpu_capacity, int mem_capacity)
+	{
+		VirtualMachine vm;
+		for(int i = 0; i < cluster.size(); i++)
+		{
+			vm = cluster.get(i);
+			if(vm.cpu_capacity >= cpu_capacity && vm.mem_capacity >= mem_capacity)
+			{
+				return true;
+			}
+		}
+		return false;
+	} 
 }

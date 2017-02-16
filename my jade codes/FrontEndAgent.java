@@ -8,8 +8,18 @@ import java.util.*;
 
 public class FrontEndAgent extends Agent
 {
+	File file;
+	FileWriter fw;
 	public void setup()
 	{
+		try
+		{
+			file = new File("logfile.txt");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 		setEnabledO2ACommunication(true,0);
 		addBehaviour(new RequestProcessor());
 	}
@@ -20,6 +30,7 @@ public class FrontEndAgent extends Agent
 		int i,j;
 		public void action()
 		{
+
 			if((obj = getO2AObject()) != null)
 			{
 				if(obj.getClass().getSimpleName().equals("VMRequest"))
@@ -39,6 +50,13 @@ public class FrontEndAgent extends Agent
 							if(obj.getClass().getSimpleName().equals("VMCluster"))
 							{
 								VMCluster vmcluster = (VMCluster)obj;
+								if(vmcluster.isEmpty() == true)
+								{
+									System.out.println("Error: VMRequest(CPU="+vmrequest.cpu_capacity+";Mem="+vmrequest.mem_capacity+") could not be allocated in any of the clusters..");
+									fw = new FileWriter(file, true);
+									fw.write("\n----Error: VMRequest(CPU="+vmrequest.cpu_capacity+";Mem="+vmrequest.mem_capacity+") could not be allocated in any of the clusters----");
+									break;
+								}
 								//assign weights and pick one vm and change the vm's status
 								VMCluster vmcluster2 = new VMCluster();
 								VirtualMachine vm;
@@ -139,8 +157,7 @@ public class FrontEndAgent extends Agent
 								String print_string = str0+"\n"+str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5;
 								// JOptionPane.showMessageDialog(null,str1+"\n\n"+str2+"\n"+free_vms_str+"\n"+str3+"\n"+str4+"\n"+str5);
 								// System.out.println(print_string);
-								File file = new File("logfile.txt");
-								FileWriter fw = new FileWriter(file, true);
+								fw = new FileWriter(file, true);
 								fw.write("\n------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 								fw.write("\n"+new Date()+"\n"+print_string);
 								fw.close();

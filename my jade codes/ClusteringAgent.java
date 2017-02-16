@@ -266,7 +266,7 @@ public class ClusteringAgent extends Agent
 		
 		public VMCluster clusterRequest(int cpu_capacity,int mem_capacity)
 		{	
-			double[] dis = new double[k];
+			/*double[] dis = new double[k];
 			int min = 0;
 			for(int i=0;i<k;i++) //for each cluster
 			{
@@ -276,7 +276,48 @@ public class ClusteringAgent extends Agent
 					min = i;
 				}
 			}
-			return vmcluster[min];
+			return vmcluster[min];*/
+
+			//This block returns a cluster such that the given request can be satisfied by one of the VMs in it
+			//If the request cannot be satisfied by any of the clusters due to insufficient VMs, it returns an empty VMCluster
+			double[] dis = new double[k];
+			int i, j, temp_order;
+			int[] cluster_order = new int[k];
+			double temp;
+
+			for(i = 0; i < k; i++)
+			{
+				dis[i] = findDis(cpu_capacity,mem_capacity,vmcluster[i].xcentroid,vmcluster[i].ycentroid);
+				cluster_order[i] = i; //initially cluster 'i' in 'i'th position
+			}
+			//sorting
+			for(i = 0; i < (k-1); i++)
+			{
+				for(j = (i+1); j < k; j++)
+				{
+					if(dis[i] > dis[j])
+					{
+						//swapping dis
+						temp = dis[i];
+						dis[i] = dis[j];
+						dis[j] = temp;
+						//swapping cluster_order
+						temp_order = cluster_order[i];
+						cluster_order[i] = cluster_order[j];
+						cluster_order[j] = temp_order;
+					}
+				}
+			}
+			//check if the request can be satisfied in any cluster in increasing order of cluster_order[i]
+			for(i = 0; i < k; i++)
+			{
+				j = cluster_order[i];
+				if(vmcluster[j].checkAllocationPossibility(cpu_capacity, mem_capacity) == true)
+				{
+					return vmcluster[j];
+				}
+			}
+			return new VMCluster(); //returning empty VMCluster
 		}
 
 		double findDis(int x1,int y1,double x2,double y2)

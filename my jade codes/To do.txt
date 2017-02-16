@@ -1,19 +1,24 @@
-=>index out of bound exception in FrontEndAgent.java => VirtualMachine selectedvm = vmcluster2.get(min);(116)
-
-=>search in other clusters if the cluster chosen has no sufficient VMs satisfying the given request
+done in CA 
+	=>index out of bound exception in FrontEndAgent.java => VirtualMachine selectedvm = vmcluster2.get(min);(116)
+	=>search in other clusters if the cluster chosen has no sufficient VMs satisfying the given request
 
 =>display job execution logs in different colors(one color for server, another for vm and so on)
 
 done => Fix bug in 'NullPointerException' in selected_server and selected_vm variables
 done => Do necessary actions for 'No potential server found' case
+
+
+done => Server selection for migration when server's threshold is exceeded
+
 => 'Server machine received to ...' message is the last one to appear - do necessary actions for this case
 => remove the dummy variable in VMA.java
 => remove unnecessary print messages
 
 
-done => Server selection for migration when server's threshold is exceeded
-
 =>while monitoring threshold continuously, make sure it doesn't exceed the activation count repeatedly just because we are monitoring continuously
+
+=>Remove outer loop in Migration class in VMA (since the CA returns the correct cluster which has the necessary VM)
+=>Check cluster emptiness in VMA in Migration part
 
 ERRORS to be rectified:
 => ERROR IDENTIFIED => INNER LOOP IN VMA.JAVA IS NOT RUNNING UP TO n.
