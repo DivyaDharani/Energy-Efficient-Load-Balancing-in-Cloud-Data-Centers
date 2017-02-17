@@ -17,8 +17,8 @@ done => Server selection for migration when server's threshold is exceeded
 
 =>while monitoring threshold continuously, make sure it doesn't exceed the activation count repeatedly just because we are monitoring continuously
 
-=>Remove outer loop in Migration class in VMA (since the CA returns the correct cluster which has the necessary VM)
-=>Check cluster emptiness in VMA in Migration part
+done =>Remove outer loop in Migration class in VMA (since the CA returns the correct cluster which has the necessary VM)
+done =>Check cluster emptiness in VMA in Migration part
 
 ERRORS to be rectified:
 => ERROR IDENTIFIED => INNER LOOP IN VMA.JAVA IS NOT RUNNING UP TO n.

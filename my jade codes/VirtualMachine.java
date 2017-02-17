@@ -17,6 +17,8 @@ public class VirtualMachine
 	double cpu_usage, mem_usage;
 	JTextArea logTextArea;
 	boolean startMigration = false;
+	public static int NO_MIGRATION = 0, SERVER_OVERLOAD = 1, INSUFFICIENT_CAPACITY = 2;
+	int migrationReason = VirtualMachine.NO_MIGRATION; 
 	int exec_time, extra_cpu_needed, extra_mem_needed;
 
 	public VirtualMachine(int local_id,int server_id,String vma_name,int cpu_capacity,int mem_capacity, JTextArea logTextArea)
@@ -70,6 +72,7 @@ public class VirtualMachine
 					if(startMigration == false)
 					{
 						startMigration = true;
+						migrationReason = VirtualMachine.INSUFFICIENT_CAPACITY;
 						logTextArea.append("\n"+new Date()+" -> MIGRATION TO BE TRIGGERED FOR "+vma_name);
 						//remaining execution time
 						exec_time = exec_time - (int)(exec_time * 0.75 * 1000);

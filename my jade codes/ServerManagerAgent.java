@@ -250,6 +250,7 @@ public class ServerManagerAgent extends Agent
  				VirtualMachine selected_vm = vm_temp[num_of_vms / 2];
  				logTextArea.append("\nSelected VM from server "+ID+" for migration => "+selected_vm.vma_name);
  				selected_vm.startMigration = true;
+ 				selected_vm.migrationReason = VirtualMachine.SERVER_OVERLOAD;
  				//calculate remaining execution time 
  			}
  		}
