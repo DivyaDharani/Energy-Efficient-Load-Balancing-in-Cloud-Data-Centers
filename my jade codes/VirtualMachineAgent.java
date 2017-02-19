@@ -135,7 +135,7 @@ public class VirtualMachineAgent extends Agent
 					VirtualMachine vm;
 					int count = 0, max_diff_for = 0;
 					double total_diff, max_total_diff = 0;
-					
+
 					System.out.println("Iteration count n = "+n+" for "+vma_name);
 					for(int i = 0; i < n; i++)
 					{
@@ -144,8 +144,6 @@ public class VirtualMachineAgent extends Agent
 						//checking status to see if the VM is busy/free and if it's able to allocate the required amount of CPU and memory for the job
 						if(vm.status == VirtualMachine.FREE && vm.cpu_capacity >= vmrequest.cpu_capacity && vm.mem_capacity >= vmrequest.mem_capacity)
 						{
-							//potential VM
-							vm_array[count] = vm; //'count' denotes the potential VMs' count
 						 	//requesting for ServerMachine instance of this VM
 						 	ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 						 	msg.setOntology("requesting-for-server-machine-instance");
@@ -160,72 +158,76 @@ public class VirtualMachineAgent extends Agent
 						 	if(obj.getClass().getSimpleName().equals("ServerMachine"))
 						 	{
 						 		dummy = -3;
-						 		serverMachines[count] = (ServerMachine)obj;
+						 		ServerMachine sm = (ServerMachine)obj;
 						 		System.out.println("ServerMachine instance of "+vm.vma_name+" - received to "+vma_name);
 						 		//check the load level when this server takes up the job to see if it exceeds the threshold
-						 		int cpu_load = serverMachines[count].cpu_load + vmrequest.cpu_capacity;
-						 		int mem_load = serverMachines[count].mem_load + vmrequest.mem_capacity;
-						 		double cpu_load_percentage = ((1.0 * cpu_load) / serverMachines[count].total_cpu) * 100;
-						 		double mem_load_percentage = ((1.0 * mem_load) / serverMachines[count].total_mem) * 100;
-						 		double cpu_load_threshold_percentage = serverMachines[count].cpu_load_threshold_percentage;
-						 		double mem_load_threshold_percentage = serverMachines[count].mem_load_threshold_percentage;
+						 		int cpu_load = sm.cpu_load + vmrequest.cpu_capacity;
+						 		int mem_load = sm.mem_load + vmrequest.mem_capacity;
+						 		double cpu_load_percentage = ((1.0 * cpu_load) / sm.total_cpu) * 100;
+						 		double mem_load_percentage = ((1.0 * mem_load) / sm.total_mem) * 100;
+						 		double cpu_load_threshold_percentage = sm.cpu_load_threshold_percentage;
+						 		double mem_load_threshold_percentage = sm.mem_load_threshold_percentage;
 
 						 		//(threshold level - load) => for the best server, this diff is maximum 
-						 		total_diff = (cpu_load_threshold_percentage - cpu_load_percentage) + (mem_load_threshold_percentage - mem_load_percentage);
-						 		if(count == 0) //first potential VM's server
+						 		double cpu_diff = cpu_load_threshold_percentage - cpu_load_percentage;
+						 		double mem_diff = mem_load_threshold_percentage - mem_load_percentage;
+
+						 		if(cpu_diff >= 0 && mem_diff >= 0)//checking if it exceeds the threshold
 						 		{
-						 			max_diff_for = count;
-						 			max_total_diff = total_diff;
-						 		}
-						 		else
-						 		{
-						 			if(total_diff > max_total_diff)
-						 			{
-						 				max_total_diff = total_diff;
-						 				max_diff_for = count;
-						 				dummy = max_diff_for;
-						 			}
-						 		}
+						 			//this server will not be overloaded even when the job is migrated to it; so include the concerned VM and the server 
+						 			serverMachines[count] = sm;
+						 			vm_array[count] = vm; 
+
+							 		total_diff = cpu_diff + mem_diff;
+							 		
+							 		if(count == 0) //first potential VM's server
+							 		{
+							 			max_diff_for = count;
+							 			max_total_diff = total_diff;
+							 		}
+							 		else
+							 		{
+							 			if(total_diff > max_total_diff)
+							 			{
+							 				max_total_diff = total_diff;
+							 				max_diff_for = count;
+							 				dummy = max_diff_for;
+							 			}
+							 		}
+							 		count++;
+							 	}
 						 	}
 						 	else
 						 	{
 						 		System.out.println("Some other object is received in place of ServerMachine to VMA "+vma_name);
 						 	}
-
-						 	count ++;
 						}  
 					}
 					if(count == 0) //no capable VM is free; so try next time (some VM may complete the job and it may become free)
 					{
-						System.out.println("No capable VM is free for migration of job from "+vma_name);
+						System.out.println("No potential server found - for migration of job from "+vma_name);
 						return;
 					}
 					//count > 0 // at least one server and a VM in it are found
-					if(max_total_diff >= 0) //making sure the threshold is not exceeded for the best server found
-					{				
-						//serverMachines[max_diff_for] gives the server; vm_array[max_diff_for] gives the VM in the selected server to which the job is to be given
-						ServerMachine selected_server = serverMachines[max_diff_for];
-						VirtualMachine selected_vm = vm_array[max_diff_for];
+						
+					//serverMachines[max_diff_for] gives the selected server; vm_array[max_diff_for] gives the VM in the selected server to which the job is to be given
+					ServerMachine selected_server = serverMachines[max_diff_for];
+					VirtualMachine selected_vm = vm_array[max_diff_for];
 
-						//Migration
-						if(selected_vm.status == VirtualMachine.FREE) //checking if the selected VM is still free
-						{
-							logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name);
-							//migration can be done
-							selected_vm.runMachine(vmrequest);
-							//after migration
-							vminstance.startMigration = false;
-							vminstance.migrationReason = VirtualMachine.NO_MIGRATION;
-							vminstance.status = VirtualMachine.FREE; //after migration, this VM will be free since job is ported to some other VM in some other server
-						}
-						else
-						{
-							logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name+" ----- Oops! VM is found be busy ; Cannot be allocated !!");
-						}
+					//Migration
+					if(selected_vm.status == VirtualMachine.FREE) //checking if the selected VM is still free
+					{
+						logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name);
+						//migration can be done
+						selected_vm.runMachine(vmrequest);
+						//after migration
+						vminstance.startMigration = false;
+						vminstance.migrationReason = VirtualMachine.NO_MIGRATION;
+						vminstance.status = VirtualMachine.FREE; //after migration, this VM will be free since job is ported to some other VM in some other server
 					}
 					else
 					{
-						System.out.println("No potential server found - for migration of job from "+vma_name);
+						logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name+" ----- Oops! VM is found be busy ; Migration failed !!");
 					}
 				}
 				catch(Exception e)
