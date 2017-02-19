@@ -217,7 +217,7 @@ public class VirtualMachineAgent extends Agent
 					//Migration
 					if(selected_vm.status == VirtualMachine.FREE) //checking if the selected VM is still free
 					{
-						logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name);
+						logTextArea.append("\n\nSELECTED SERVER : "+selected_server.ID+"; SELECTED VM: "+selected_vm.vma_name+" => FOR THE JOB IN VM "+vma_name+"\n");
 						//migration can be done
 						selected_vm.runMachine(vmrequest);
 						//after migration
@@ -227,7 +227,7 @@ public class VirtualMachineAgent extends Agent
 					}
 					else
 					{
-						logTextArea.append("\nSelected server : "+selected_server.ID+"; Selected VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name+" ----- Oops! VM is found be busy ; Migration failed !!");
+						logTextArea.append("\n\nSELECTED SERVER : "+selected_server.ID+"; SELECTED VM: "+selected_vm.vma_name+" => for the job in VM "+vma_name+" ----- Oops! VM is found be busy ; MIGRATION FAILED !!\n");
 					}
 				}
 				catch(Exception e)
