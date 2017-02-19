@@ -3,6 +3,8 @@ import jade.core.behaviours.*;
 import jade.lang.acl.*;
 import jade.wrapper.*;
 import javax.swing.*;
+import java.util.*;
+
 public class VirtualMachineAgent extends Agent
 {
 	// VirtualMachine[] vms = new VirtualMachine[12];
@@ -180,7 +182,8 @@ public class VirtualMachineAgent extends Agent
 
 							 		total_diff = cpu_diff + mem_diff;
 							 		
-							 		if(count == 0) //first potential VM's server
+							 		//finding the best fit
+							 		/*if(count == 0) //first potential VM's server
 							 		{
 							 			max_diff_for = count;
 							 			max_total_diff = total_diff;
@@ -194,7 +197,13 @@ public class VirtualMachineAgent extends Agent
 							 				dummy = max_diff_for;
 							 			}
 							 		}
+							 		count++;*/
+
+							 		//finding the first fit (without changing the code structure of max_diff_for)
+							 		max_diff_for = count;
+							 		max_total_diff = total_diff;
 							 		count++;
+							 		break;
 							 	}
 						 	}
 						 	else
@@ -217,7 +226,7 @@ public class VirtualMachineAgent extends Agent
 					//Migration
 					if(selected_vm.status == VirtualMachine.FREE) //checking if the selected VM is still free
 					{
-						logTextArea.append("\n\nSELECTED SERVER : "+selected_server.ID+"; SELECTED VM: "+selected_vm.vma_name+" => FOR THE JOB IN VM "+vma_name+"\n");
+						logTextArea.append("\n\n"+new Date()+" -> SELECTED SERVER : "+selected_server.ID+"; SELECTED VM: "+selected_vm.vma_name+" => FOR THE JOB IN VM "+vma_name+"\n");
 						//migration can be done
 						selected_vm.runMachine(vmrequest);
 						//after migration
