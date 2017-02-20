@@ -194,17 +194,23 @@ public class ServerManagerAgent extends Agent
  					mem_load_activation_count = 0;
 
  				//choosing VM for migration
- 				VirtualMachine[] vm_temp = vms.clone();
- 				int i,j;
- 				double temp;
+ 				VirtualMachine[] vm_temp = new VirtualMachine[num_of_vms];
+ 				int busy_vm_count = 0, i, j;
+ 				//considering only those VMs that are engaged with a job
  				for(i = 0; i < num_of_vms; i++)
+ 				{
+ 					if(vms[i].status == VirtualMachine.BUSY)
+ 						vm_temp[busy_vm_count++] = vms[i]; 
+ 				}
+ 				double temp;
+ 				for(i = 0; i < busy_vm_count; i++)
  				{
  					vm_temp[i].cpu_usage = vm_temp[i].cpu_occupied / (vm_temp[i].cpu_capacity * 1.0);
  				}
  				//sorting acc. to cpu usage
- 				for(i = 0; i < num_of_vms - 1; i++)
+ 				for(i = 0; i < busy_vm_count - 1; i++)
  				{
- 					for(j = i; j < num_of_vms; j++)
+ 					for(j = i; j < busy_vm_count; j++)
  					{
  						if(vm_temp[i].cpu_usage > vm_temp[j].cpu_usage)
  						{
@@ -215,14 +221,14 @@ public class ServerManagerAgent extends Agent
  					}
  				}
  				//assigning cpu weights
- 				for(i = 0; i < num_of_vms; i++)
+ 				for(i = 0; i < busy_vm_count; i++)
  				{
  					vm_temp[i].cpu_weight = i+1;
  				}
  				//sorting acc. to memory usage
- 				for(i = 0; i < num_of_vms - 1; i++)
+ 				for(i = 0; i < busy_vm_count - 1; i++)
  				{
- 					for(j = i; j < num_of_vms; j++)
+ 					for(j = i; j < busy_vm_count; j++)
  					{
  						if(vm_temp[i].mem_usage > vm_temp[j].mem_usage)
  						{
@@ -233,15 +239,15 @@ public class ServerManagerAgent extends Agent
  					}
  				}
  				//assigning memory weights
- 				for(i = 0; i < num_of_vms; i++)
+ 				for(i = 0; i < busy_vm_count; i++)
  				{
  					vm_temp[i].mem_weight = i+1;
  					vm_temp[i].total_weight = vm_temp[i].cpu_weight + vm_temp[i].mem_weight;
  				}
  				//sorting acc. to total_weight
- 				for(i = 0; i < num_of_vms - 1; i++)
+ 				for(i = 0; i < busy_vm_count - 1; i++)
  				{
- 					for(j = i; j < num_of_vms; j++)
+ 					for(j = i; j < busy_vm_count; j++)
  					{
  						if(vm_temp[i].total_weight > vm_temp[j].total_weight)
  						{
