@@ -73,7 +73,7 @@ public class VirtualMachine
 					{
 						startMigration = true;
 						migrationReason = VirtualMachine.INSUFFICIENT_CAPACITY;
-						logTextArea.append("\n"+new Date()+" -> MIGRATION TO BE TRIGGERED FOR "+vma_name);
+						logTextArea.append("\n\n"+new Date()+" -> MIGRATION TO BE TRIGGERED FOR "+vma_name+"\n");
 						//remaining execution time
 						exec_time = exec_time - (int)(exec_time * 0.75);
 					}

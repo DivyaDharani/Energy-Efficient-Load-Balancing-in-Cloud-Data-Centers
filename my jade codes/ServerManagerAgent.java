@@ -12,7 +12,7 @@ public class ServerManagerAgent extends Agent
 	double cpu_load_threshold, mem_load_threshold;
 	int cpu_load, mem_load, cpu_load_activation_threshold, mem_load_activation_threshold, cpu_load_activation_count, mem_load_activation_count;
 	double cpu_load_percentage, mem_load_percentage, cpu_load_threshold_percentage, mem_load_threshold_percentage; 
-	VirtualMachine[] vm; 
+	VirtualMachine[] vms; 
 	ServerMachine serverMachine;
 	JTextArea logTextArea;
 	public void setup()
@@ -24,7 +24,7 @@ public class ServerManagerAgent extends Agent
 		total_cpu = (Integer)args[2];
 		total_mem = (Integer)args[3];
 		logTextArea = (JTextArea)args[4];
-		vm = new VirtualMachine[num_of_vms];
+		vms = new VirtualMachine[num_of_vms];
 		// System.out.println(getLocalName()+" with ID "+ID+" is started.(No. of vms => "+num_of_vms+")");
 		addBehaviour(new RequestGetter());
 		addBehaviour(new TriggerThresholdMonitoring());
@@ -39,16 +39,19 @@ public class ServerManagerAgent extends Agent
  		mem_load = 0;
  		for(int i = 0; i < num_of_vms; i++)
  		{
- 			cpu_load += vm[i].cpu_occupied; //total load of all VMs
- 			mem_load += vm[i].mem_occupied;
- 			cpu_load_percentage = ((1.0 * cpu_load) / total_cpu) * 100;
- 			mem_load_percentage = ((1.0 * mem_load) / total_mem) * 100;
-
- 			serverMachine.cpu_load = cpu_load;
- 			serverMachine.mem_load = mem_load;
- 			serverMachine.cpu_load_percentage = cpu_load_percentage;
- 			serverMachine.mem_load_percentage = mem_load_percentage;
+ 			if(vms[i].status == VirtualMachine.FREE)
+ 			{
+ 				cpu_load += vms[i].cpu_occupied; //total load of all VMs
+ 				mem_load += vms[i].mem_occupied;	
+ 			}
  		}
+ 		cpu_load_percentage = ((1.0 * cpu_load) / total_cpu) * 100;
+ 		mem_load_percentage = ((1.0 * mem_load) / total_mem) * 100;
+
+		serverMachine.cpu_load = cpu_load;
+		serverMachine.mem_load = mem_load;
+		serverMachine.cpu_load_percentage = cpu_load_percentage;
+		serverMachine.mem_load_percentage = mem_load_percentage;
  	}
 
 	class RequestGetter extends CyclicBehaviour
@@ -147,7 +150,7 @@ public class ServerManagerAgent extends Agent
  					;
  				if(obj.getClass().getSimpleName().equals("VirtualMachine"))
  				{
- 					vm[i] = (VirtualMachine)obj;
+ 					vms[i] = (VirtualMachine)obj;
  				}
  			} 			
  		}
@@ -173,6 +176,8 @@ public class ServerManagerAgent extends Agent
  	{
  		public void action()
  		{
+ 			if(serverMachine.migration_triggered == true) //already if the VM to be migrated is found for the current load, skip the below process
+ 				return;
  			calculateLoad();
  			if(cpu_load_percentage > cpu_load_threshold_percentage)
  				cpu_load_activation_count ++;
@@ -182,14 +187,14 @@ public class ServerManagerAgent extends Agent
  			if((cpu_load_activation_count > cpu_load_activation_threshold) || (mem_load_activation_count > mem_load_activation_threshold))
  			{
  				//trigger migration 
- 				logTextArea.append("\nMIGRATION TO BE TRIGGERED FOR SERVER "+ID+" !!");
+ 				logTextArea.append("\n\nMIGRATION TO BE TRIGGERED FOR SERVER "+ID+" !!\n");
  				if(cpu_load_activation_threshold > cpu_load_activation_threshold)
  					cpu_load_activation_count = 0;
  				if(mem_load_activation_count > mem_load_activation_threshold)
  					mem_load_activation_count = 0;
 
  				//choosing VM for migration
- 				VirtualMachine[] vm_temp = vm.clone();
+ 				VirtualMachine[] vm_temp = vms.clone();
  				int i,j;
  				double temp;
  				for(i = 0; i < num_of_vms; i++)
@@ -248,7 +253,8 @@ public class ServerManagerAgent extends Agent
  				}
  				//choosing the middle VM in the new order
  				VirtualMachine selected_vm = vm_temp[num_of_vms / 2];
- 				logTextArea.append("\nSelected VM from server "+ID+" for migration => "+selected_vm.vma_name);
+ 				serverMachine.migration_triggered = true;//to avoid triggering the same computation again and again when the server's threshold is exceeded
+ 				logTextArea.append("\n\nSelected VM from server "+ID+" for migration => "+selected_vm.vma_name+"\n");
  				selected_vm.startMigration = true;
  				selected_vm.migrationReason = VirtualMachine.SERVER_OVERLOAD;
  				//calculate remaining execution time 

@@ -229,10 +229,33 @@ public class VirtualMachineAgent extends Agent
 						logTextArea.append("\n\n"+new Date()+" -> SELECTED SERVER : "+selected_server.ID+"; SELECTED VM: "+selected_vm.vma_name+" => FOR THE JOB IN VM "+vma_name+"\n");
 						//migration can be done
 						selected_vm.runMachine(vmrequest);
+						//to notify this VM's server about successful migration 
+						if(vminstance.migrationReason == VirtualMachine.SERVER_OVERLOAD)
+						{
+							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+						 	msg.setOntology("requesting-for-server-machine-instance");
+						 	msg.addReceiver(new AID("sma"+vminstance.server_id,AID.ISLOCALNAME));
+						 	send(msg);
+
+						 	//getting the ServerMachine object
+						 	while((obj = getO2AObject()) == null)
+						 		;
+						 	if(obj.getClass().getSimpleName().equals("ServerMachine"))
+						 	{
+						 		ServerMachine sm = (ServerMachine)obj;
+						 		sm.migration_triggered = false; //clearing the variable for the next round of migration
+						 	}
+						 	else
+						 	{
+						 		System.out.println("In VMA -> Some other object is received in place of ServerMachine object !!");
+						 	}
+						}
 						//after migration
 						vminstance.startMigration = false;
 						vminstance.migrationReason = VirtualMachine.NO_MIGRATION;
 						vminstance.status = VirtualMachine.FREE; //after migration, this VM will be free since job is ported to some other VM in some other server
+						vminstance.cpu_occupied = 0;
+						vminstance.mem_occupied = 0;
 					}
 					else
 					{
