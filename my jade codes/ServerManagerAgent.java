@@ -9,9 +9,10 @@ import javax.swing.*;
 public class ServerManagerAgent extends Agent
 {
 	int ID, num_of_vms, total_cpu, total_mem;
-	double cpu_load_threshold, mem_load_threshold;
+	double cpu_load_threshold, mem_load_threshold, cpu_energy_threshold, mem_energy_threshold;
 	int cpu_load, mem_load, cpu_load_activation_threshold, mem_load_activation_threshold, cpu_load_activation_count, mem_load_activation_count;
-	double cpu_load_percentage, mem_load_percentage, cpu_load_threshold_percentage, mem_load_threshold_percentage; 
+	double cpu_load_percentage, mem_load_percentage, cpu_load_threshold_percentage, mem_load_threshold_percentage;
+	double cpu_energy_threshold_percentage, mem_energy_threshold_percentage; 
 	VirtualMachine[] vms; 
 	ServerMachine serverMachine;
 	JTextArea logTextArea;
@@ -160,6 +161,7 @@ public class ServerManagerAgent extends Agent
  	{
  		public void action()
  		{
+ 			//load related thresholds
  			//threshold specific to the capacity of this server
  			serverMachine.cpu_load_threshold = cpu_load_threshold = 0.75 * total_cpu;
  			serverMachine.mem_load_threshold = mem_load_threshold = 0.75 * total_mem;
@@ -169,6 +171,13 @@ public class ServerManagerAgent extends Agent
 
  			serverMachine.cpu_load_activation_threshold = cpu_load_activation_threshold = 3;
  			serverMachine.mem_load_activation_threshold = mem_load_activation_threshold = 3;
+
+ 			//energy related thresholds
+ 			serverMachine.cpu_energy_threshold = cpu_energy_threshold = 0.25 * total_cpu;
+ 			serverMachine.mem_energy_threshold = mem_energy_threshold = 0.25 * total_mem;
+
+ 			serverMachine.cpu_energy_threshold_percentage = cpu_energy_threshold_percentage = 25;
+ 			serverMachine.mem_energy_threshold_percentage = mem_energy_threshold_percentage = 25;
   		}
  	}
 
@@ -183,9 +192,18 @@ public class ServerManagerAgent extends Agent
  				cpu_load_activation_count ++;
  			if(mem_load_percentage > mem_load_threshold_percentage)
  				mem_load_activation_count ++;
-
- 			if((cpu_load_activation_count > cpu_load_activation_threshold) || (mem_load_activation_count > mem_load_activation_threshold))
+ 			
+ 			if(cpu_load_percentage == 0 && mem_load_percentage == 0)
  			{
+ 				serverMachine.status = ServerMachine.NOT_UTILIZED;
+ 			}
+ 			else if(cpu_load_percentage < cpu_energy_threshold_percentage && mem_load_percentage < mem_energy_threshold_percentage)
+ 			{
+ 				serverMachine.status = ServerMachine.UNDER_UTILIZED;
+ 			}
+ 			else if((cpu_load_activation_count > cpu_load_activation_threshold) || (mem_load_activation_count > mem_load_activation_threshold))
+ 			{
+ 				serverMachine.status = ServerMachine.OVER_UTILIZED;
  				//trigger migration 
  				logTextArea.append("\n\nMIGRATION TO BE TRIGGERED FOR SERVER "+ID+" !!\n");
  				if(cpu_load_activation_threshold > cpu_load_activation_threshold)
@@ -264,6 +282,10 @@ public class ServerManagerAgent extends Agent
  				selected_vm.startMigration = true;
  				selected_vm.migrationReason = VirtualMachine.SERVER_OVERLOAD;
  				//calculate remaining execution time 
+ 			}
+ 			else
+ 			{
+ 				serverMachine.status = ServerMachine.NORMALLY_UTILIZED;
  			}
  		}
  	}

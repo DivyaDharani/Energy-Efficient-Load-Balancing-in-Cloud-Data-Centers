@@ -20,5 +20,9 @@ done => Server selection for migration when server's threshold is exceeded
 done =>Remove outer loop in Migration class in VMA (since the CA returns the correct cluster which has the necessary VM)
 done =>Check cluster emptiness in VMA in Migration part
 
+Server Consolidation
+	Monitoring status of servers in FA
+	Leader selection in FA
+	
 ERRORS to be rectified:
 => ERROR IDENTIFIED => INNER LOOP IN VMA.JAVA IS NOT RUNNING UP TO n.
