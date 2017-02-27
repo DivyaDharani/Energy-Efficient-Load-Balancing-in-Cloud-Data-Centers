@@ -138,7 +138,18 @@ public class UserAgent extends Agent
 						msg.addReceiver(new AID("sma"+i,AID.ISLOCALNAME));
 					send(msg);
 
+					/*msg.setOntology("start-collecting-ServerMachine");
+					msg.addReceiver(new AID("fa", AID.ISLOCALNAME));
+					send(msg);
 
+					msg = null;
+					MessageTemplate msgTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchOntology("recieved-all-server-machine-instances"));
+					while(msg == null)
+					{
+						msg = receive(msgTemplate); 
+					}
+					//response received.. start automating requests
+					*/
 					JFrame frame = new JFrame("VM instances");
 					JTextArea textArea = new JTextArea();
 					textArea.setLineWrap(true);
