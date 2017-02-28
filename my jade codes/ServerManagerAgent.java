@@ -25,12 +25,11 @@ public class ServerManagerAgent extends Agent
 		total_cpu = (Integer)args[2];
 		total_mem = (Integer)args[3];
 		logTextArea = (JTextArea)args[4];
+		serverMachine = (ServerMachine)args[5];
 		vms = new VirtualMachine[num_of_vms];
 		// System.out.println(getLocalName()+" with ID "+ID+" is started.(No. of vms => "+num_of_vms+")");
 		addBehaviour(new RequestGetter());
 		addBehaviour(new TriggerThresholdMonitoring());
-		
-		serverMachine = new ServerMachine(ID, num_of_vms, total_cpu, total_mem);
 		addBehaviour(new ServerMachineProvider());
  	}
 

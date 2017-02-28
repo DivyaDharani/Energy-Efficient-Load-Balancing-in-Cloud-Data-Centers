@@ -48,9 +48,8 @@ public class AgentStarter extends Agent
 				
 				cc = getContainerController(); //method of Agent class
 				inc = 0;
+				//creating user agent
 				ac[inc++] = cc.createNewAgent("ua","UserAgent",null);
-				// ac.start();
-				ac[inc++] = cc.createNewAgent("fa","FrontEndAgent",null);
 				// ac.start();
 
 				/*//creating server manager agents
@@ -72,6 +71,8 @@ public class AgentStarter extends Agent
 				int vminc=1;
 				String cpustr,memstr;
 				String[] cpuarr,memarr;
+				ServerMachine[] serverMachines = new ServerMachine[sma]; 
+				int server_count = 0;
 				for(i=1;i<=sma;i++)
 				{
 					cpustr = cpubf.readLine(); //each line in file represents one server's info
@@ -87,7 +88,8 @@ public class AgentStarter extends Agent
 						total_mem += Integer.parseInt(memarr[t]);
 
 					//creating SMA
-					ac[inc++] = cc.createNewAgent("sma"+i,"ServerManagerAgent",new Object[]{i, num_of_vms(i), total_cpu, total_mem, logTextArea});//passing server's ID, no. of vms in it, and total cpu and memory capacities 
+					serverMachines[server_count++] = new ServerMachine(i, num_of_vms(i), total_cpu, total_mem);
+					ac[inc++] = cc.createNewAgent("sma"+i,"ServerManagerAgent",new Object[]{i, num_of_vms(i), total_cpu, total_mem, logTextArea, serverMachines[server_count-1]});//passing server's ID, no. of vms in it, total cpu and memory capacities, and ServerMachine instance 
 
 					//creating VMAs of server 'i'
 					j = num_of_vms(i);
@@ -99,7 +101,10 @@ public class AgentStarter extends Agent
 						// ac.start();
 					}
 				}
-				//starting clustering agent
+				//creating front end agent
+				ac[inc++] = cc.createNewAgent("fa","FrontEndAgent",new Object[]{serverMachines});
+				// ac.start();
+				//creating clustering agent
 				ac[inc++] = cc.createNewAgent("ca","ClusteringAgent",null);
 				// ac.start();
 

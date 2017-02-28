@@ -2,7 +2,6 @@ import jade.core.*;
 import jade.core.behaviours.*;
 import jade.lang.acl.*;
 import javax.swing.*;
-import java.awt.event.*;
 import jade.wrapper.*;
 import java.io.*;
 import java.util.*;
@@ -11,10 +10,11 @@ public class FrontEndAgent extends Agent
 {
 	File file;
 	FileWriter fw;
-	int sma_count = 12, count = 0;
-	ServerMachine[] serverMachines = new ServerMachine[sma_count];
+	ServerMachine[] serverMachines;
 	public void setup()
 	{
+		Object[] args = getArguments();
+		serverMachines = (ServerMachine[])args[0];
 		try
 		{
 			file = new File("logfile.txt");
@@ -24,7 +24,6 @@ public class FrontEndAgent extends Agent
 			e.printStackTrace();
 		}
 		setEnabledO2ACommunication(true,0);
-		// addBehaviour(new DummyServerMachineCollector());
 		addBehaviour(new RequestProcessor());
 	}
 
@@ -179,96 +178,6 @@ public class FrontEndAgent extends Agent
 			}
 		}
 	}
-
-	/*class ServerMachineCollector extends CyclicBehaviour
-	{
-		public void action()
-		{
-			MessageTemplate msgTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchOntology("start-collecting-ServerMachine"));
-			ACLMessage msg = receive(msgTemplate);
-			if(msg != null)
-			{
-				msg = new ACLMessage(ACLMessage.REQUEST);
-				msg.setOntology("requesting-for-server-machine-instance");
-				for(int i=1; i<=sma_count; i++)
-				{
-					msg.clearAllReceiver();
-					msg.addReceiver(new AID("sma"+i,AID.ISLOCALNAME));
-					send(msg);
-					System.out.println("Server Request sent (ID:"+i+")");
-					Object obj = null;
-					while((obj = getO2AObject()) == null)
-						;
-					if(obj.getClass().getSimpleName().equals("ServerMachine"))
-					{
-						serverMachines[count++] = (ServerMachine)obj;
-						System.out.println("ServerMachine instance (ID: "+serverMachines[count-1].ID+") received; Count = "+count);
-						if(count == sma_count)
-						{
-							System.out.println("FA received all ServerMachine instances from all the servers... Now you may start automating the VM requests..");
-							msg = new ACLMessage(ACLMessage.INFORM);
-							msg.setOntology("recieved-all-server-machine-instances");
-							msg.addReceiver(new AID("ua",AID.ISLOCALNAME));
-							send(msg);
-							removeBehaviour(this);
-							System.out.println("Unreachable statement");
-						}
-					}
-					else
-					{
-						System.out.println("Some other object is received in place of ServerMachine in FA");
-					}
-				}
-			}
-		}
-	}
-
-	class DummyServerMachineCollector extends OneShotBehaviour
-	{
-		public void action()
-		{
-			JFrame frame = new JFrame("");
-			frame.setSize(200,200);
-			JButton button = new JButton("Trigger Server Consolidation");
-			button.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e)
-				{
-					ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-					msg.setOntology("requesting-for-server-machine-instance");
-					for(int i=1; i<=sma_count; i++)
-					{
-						msg.clearAllReceiver();
-						msg.addReceiver(new AID("sma"+i,AID.ISLOCALNAME));
-						send(msg);
-						System.out.println("Server Request sent (ID:"+i+")");
-						Object obj = null;
-						while((obj = getO2AObject()) == null)
-							;
-						System.out.println("Reached this statement in iteration "+i+" of ServerMachineCollector Behaviour in FA");
-						if(obj.getClass().getSimpleName().equals("ServerMachine"))
-						{
-							serverMachines[count++] = (ServerMachine)obj;
-							System.out.println("ServerMachine instance (ID: "+serverMachines[count-1].ID+") received; Count = "+count);
-							if(count == sma_count)
-							{
-								System.out.println("FA received all ServerMachine instances from all the servers... Now you may start automating the VM requests..");
-								msg = new ACLMessage(ACLMessage.INFORM);
-								msg.setOntology("recieved-all-server-machine-instances");
-								msg.addReceiver(new AID("ua",AID.ISLOCALNAME));
-								send(msg);
-								System.out.println("Unreachable statement");
-							}
-						}
-						else
-						{
-							System.out.println("Some other object is received in place of ServerMachine in FA");
-						}
-					}
-				}});
-			frame.add(button);
-			frame.setVisible(true);
-		}
-	}*/
 
 	//sample class
 	/*class RequestGetter extends CyclicBehaviour
