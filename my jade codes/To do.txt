@@ -26,3 +26,4 @@ Server Consolidation
 	
 ERRORS to be rectified:
 => ERROR IDENTIFIED => INNER LOOP IN VMA.JAVA IS NOT RUNNING UP TO n.
+=> Migration is triggered for the same server many times for the same VM
