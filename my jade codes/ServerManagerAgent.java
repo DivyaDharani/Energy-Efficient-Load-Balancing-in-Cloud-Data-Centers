@@ -39,7 +39,7 @@ public class ServerManagerAgent extends Agent
  		mem_load = 0;
  		for(int i = 0; i < num_of_vms; i++)
  		{
- 			if(vms[i].status == VirtualMachine.FREE)
+ 			if(vms[i].status == VirtualMachine.BUSY)
  			{
  				cpu_load += vms[i].cpu_occupied; //total load of all VMs
  				mem_load += vms[i].mem_occupied;	
