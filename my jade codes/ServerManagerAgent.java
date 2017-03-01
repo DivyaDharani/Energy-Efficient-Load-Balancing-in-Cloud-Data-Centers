@@ -10,7 +10,7 @@ public class ServerManagerAgent extends Agent
 {
 	int ID, num_of_vms, total_cpu, total_mem;
 	double cpu_load_threshold, mem_load_threshold, cpu_energy_threshold, mem_energy_threshold;
-	int cpu_load, mem_load, cpu_load_activation_threshold, mem_load_activation_threshold, cpu_load_activation_count, mem_load_activation_count;
+	int cpu_load, mem_load; 
 	double cpu_load_percentage, mem_load_percentage, cpu_load_threshold_percentage, mem_load_threshold_percentage;
 	double cpu_energy_threshold_percentage, mem_energy_threshold_percentage; 
 	VirtualMachine[] vms; 
@@ -168,9 +168,6 @@ public class ServerManagerAgent extends Agent
  			serverMachine.cpu_load_threshold_percentage = cpu_load_threshold_percentage = 75;
  			serverMachine.mem_load_threshold_percentage = mem_load_threshold_percentage = 75;
 
- 			serverMachine.cpu_load_activation_threshold = cpu_load_activation_threshold = 3;
- 			serverMachine.mem_load_activation_threshold = mem_load_activation_threshold = 3;
-
  			//energy related thresholds
  			serverMachine.cpu_energy_threshold = cpu_energy_threshold = 0.25 * total_cpu;
  			serverMachine.mem_energy_threshold = mem_energy_threshold = 0.25 * total_mem;
@@ -187,11 +184,7 @@ public class ServerManagerAgent extends Agent
  			if(serverMachine.migration_triggered == true) //already if the VM to be migrated is found for the current load, skip the below process
  				return;
  			calculateLoad();
- 			if(cpu_load_percentage > cpu_load_threshold_percentage)
- 				cpu_load_activation_count ++;
- 			if(mem_load_percentage > mem_load_threshold_percentage)
- 				mem_load_activation_count ++;
- 			
+
  			if(cpu_load_percentage == 0 && mem_load_percentage == 0)
  			{
  				serverMachine.status = ServerMachine.NOT_UTILIZED;
@@ -200,16 +193,12 @@ public class ServerManagerAgent extends Agent
  			{
  				serverMachine.status = ServerMachine.UNDER_UTILIZED;
  			}
- 			else if((cpu_load_activation_count > cpu_load_activation_threshold) || (mem_load_activation_count > mem_load_activation_threshold))
+ 			else if(cpu_load_percentage > cpu_load_threshold_percentage || mem_load_percentage > mem_load_threshold_percentage)
  			{
  				serverMachine.status = ServerMachine.OVER_UTILIZED;
  				//trigger migration 
- 				logTextArea.append("\n\nMIGRATION TO BE TRIGGERED FOR SERVER "+ID+" !!\n");
- 				if(cpu_load_activation_threshold > cpu_load_activation_threshold)
- 					cpu_load_activation_count = 0;
- 				if(mem_load_activation_count > mem_load_activation_threshold)
- 					mem_load_activation_count = 0;
-
+ 				logTextArea.append("\n\n"+new Date()+" => MIGRATION TO BE TRIGGERED FOR SERVER "+ID+" (CPU load % = "+cpu_load_percentage+", Mem load % = "+mem_load_percentage+")\n");
+ 				
  				//choosing VM for migration
  				VirtualMachine[] vm_temp = new VirtualMachine[num_of_vms];
  				int busy_vm_count = 0, i, j;
