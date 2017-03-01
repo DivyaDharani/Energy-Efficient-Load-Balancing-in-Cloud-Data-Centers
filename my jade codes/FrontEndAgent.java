@@ -11,10 +11,12 @@ public class FrontEndAgent extends Agent
 	File file;
 	FileWriter fw;
 	ServerMachine[] serverMachines;
+	JTextArea logTextArea;
 	public void setup()
 	{
 		Object[] args = getArguments();
 		serverMachines = (ServerMachine[])args[0];
+		logTextArea = (JTextArea)args[1];
 		try
 		{
 			file = new File("logfile.txt");
@@ -25,6 +27,7 @@ public class FrontEndAgent extends Agent
 		}
 		setEnabledO2ACommunication(true,0);
 		addBehaviour(new RequestProcessor());
+		addBehaviour(new TriggerServerMonitor());
 	}
 
 	class RequestProcessor extends CyclicBehaviour
@@ -175,6 +178,88 @@ public class FrontEndAgent extends Agent
 						e.printStackTrace();
 					}
 				}
+			}
+		}
+	}
+
+	class TriggerServerMonitor extends CyclicBehaviour
+	{
+		public void action()
+		{
+			MessageTemplate msgTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchOntology("start-monitoring-for-server-consolidation"));
+			ACLMessage msg = receive(msgTemplate);
+			if(msg != null)
+			{
+				addBehaviour(new ServerMonitor(new Agent(), 5000));
+				removeBehaviour(this);
+			}
+		}
+	}
+	class ServerMonitor extends TickerBehaviour 
+	{
+		ServerMachine[] under_utilized_servers, not_utilized_servers;
+		int i, under_count = 0, not_count = 0; //underutilized server count and not utilized server count
+		int total_load = 0;
+		public ServerMonitor(Agent agent, long period)
+		{
+			super(agent, period);
+		}
+		public void onTick()
+		{
+			under_utilized_servers = new ServerMachine[serverMachines.length];
+			not_utilized_servers = new ServerMachine[serverMachines.length];
+			under_count = 0;
+			not_count = 0;
+			for(i = 0; i < serverMachines.length; i++)
+			{
+				if(serverMachines[i].status == ServerMachine.NOT_UTILIZED)
+				{
+					not_utilized_servers[not_count++] = serverMachines[i];
+				}
+				else if(serverMachines[i].status == ServerMachine.UNDER_UTILIZED)
+				{
+					under_utilized_servers[under_count++] = serverMachines[i];
+				}
+			}
+			System.out.println(new Date()+" => Underutilized server list: ");
+			for(i = 0; i < under_count; i++)
+			{
+				System.out.print("\t"+under_utilized_servers[i].ID);
+			}
+			System.out.println();
+			System.out.println(new Date()+" => Not utilized server list: ");
+			for(i = 0; i < not_count; i++)
+			{
+				System.out.print("\t"+not_utilized_servers[i].ID);
+			}
+			System.out.println();
+			int min = 0, min_total_load = 0;
+			//Leader Selection
+			if(under_count > 0)
+			{
+				for(i = 0; i < under_count; i++)
+				{
+					total_load = under_utilized_servers[i].cpu_load + under_utilized_servers[i].mem_load;
+					if(i == 0)
+					{
+						min = 0;
+						min_total_load = total_load;
+					}
+					else
+					{
+						if(total_load < min_total_load)
+						{
+							min_total_load = total_load;
+							min = i;
+						}
+					}
+				}
+				System.out.println("----------- Selected leader for starting server consolidation => Server "+min+" with CPU load = "+under_utilized_servers[min].cpu_load_percentage+"%, Mem load = "+under_utilized_servers[min].mem_load_percentage+"%");
+				logTextArea.append("\n----------- Selected leader for starting server consolidation => Server "+min+" with CPU load = "+under_utilized_servers[min].cpu_load_percentage+"%, Mem load = "+under_utilized_servers[min].mem_load_percentage+"%");
+				//Trigger server consolidation
+
+				//after server consolidation
+				//turn off the server => status = NOT_UTILIZED means server is turned off
 			}
 		}
 	}

@@ -138,6 +138,10 @@ public class UserAgent extends Agent
 						msg.addReceiver(new AID("sma"+i,AID.ISLOCALNAME));
 					send(msg);
 
+					msg.setOntology("start-monitoring-for-server-consolidation");
+					msg.addReceiver(new AID("fa", AID.ISLOCALNAME));
+					send(msg);
+					
 					JFrame frame = new JFrame("VM instances");
 					JTextArea textArea = new JTextArea();
 					textArea.setLineWrap(true);

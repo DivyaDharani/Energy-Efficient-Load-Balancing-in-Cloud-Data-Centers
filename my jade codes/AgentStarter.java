@@ -102,7 +102,7 @@ public class AgentStarter extends Agent
 					}
 				}
 				//creating front end agent
-				ac[inc++] = cc.createNewAgent("fa","FrontEndAgent",new Object[]{serverMachines});
+				ac[inc++] = cc.createNewAgent("fa","FrontEndAgent",new Object[]{serverMachines, logTextArea});
 				// ac.start();
 				//creating clustering agent
 				ac[inc++] = cc.createNewAgent("ca","ClusteringAgent",null);
