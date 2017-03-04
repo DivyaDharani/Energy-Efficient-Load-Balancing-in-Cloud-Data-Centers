@@ -32,6 +32,10 @@ public class AgentStarter extends Agent
 		{
 			JFrame logFrame = new JFrame(" Job Execution Logs");
 			JTextArea logTextArea = new JTextArea();
+			logTextArea.setBackground(new Color(26,87,96));
+			Font font = new Font("Constantia", Font.PLAIN, 15);
+            logTextArea.setFont(font);
+            logTextArea.setForeground(Color.WHITE);
 			logTextArea.setLineWrap(true);
 			logTextArea.setWrapStyleWord(true);
 			JScrollPane scrollPane = new JScrollPane(logTextArea);

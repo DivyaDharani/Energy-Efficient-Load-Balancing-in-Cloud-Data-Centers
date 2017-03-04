@@ -254,8 +254,8 @@ public class FrontEndAgent extends Agent
 						}
 					}
 				}
-				System.out.println("----------- Selected leader for starting server consolidation => Server "+min+" with CPU load = "+under_utilized_servers[min].cpu_load_percentage+"%, Mem load = "+under_utilized_servers[min].mem_load_percentage+"%");
-				logTextArea.append("\n----------- Selected leader for starting server consolidation => Server "+min+" with CPU load = "+under_utilized_servers[min].cpu_load_percentage+"%, Mem load = "+under_utilized_servers[min].mem_load_percentage+"%");
+				System.out.println(new Date()+"----------- Selected leader for starting server consolidation => Server "+min+" with CPU load = "+under_utilized_servers[min].cpu_load_percentage+"%, Mem load = "+under_utilized_servers[min].mem_load_percentage+"%");
+				logTextArea.append("\n"+new Date()+"----------- Selected leader for starting server consolidation => Server "+min+" with CPU load = "+under_utilized_servers[min].cpu_load_percentage+"%, Mem load = "+under_utilized_servers[min].mem_load_percentage+"%");
 				//Trigger server consolidation
 
 				//after server consolidation
