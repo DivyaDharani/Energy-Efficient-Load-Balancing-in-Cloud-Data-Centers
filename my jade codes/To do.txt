@@ -24,7 +24,7 @@ Server Consolidation
 	done => Monitoring status of servers in FA
 	done => Leader selection in FA
 	done => Triggering Migration
-	Turning off servers
+	done => Turning off servers
 	
 ERRORS to be rectified:
 => ERROR IDENTIFIED => INNER LOOP IN VMA.JAVA IS NOT RUNNING UP TO n.

@@ -264,6 +264,7 @@ public class FrontEndAgent extends Agent
 				send(msg);
 				//after server consolidation
 				//turn off the server => status = NOT_UTILIZED means server is turned off
+				//if the load is 0, the status is set as NOT_UTILIZED in ThresholdMonitoring behaviour of SMA
 			}
 		}
 	}
