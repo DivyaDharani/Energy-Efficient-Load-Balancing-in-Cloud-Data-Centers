@@ -31,6 +31,7 @@ public class ServerManagerAgent extends Agent
 		addBehaviour(new RequestGetter());
 		addBehaviour(new TriggerThresholdMonitoring());
 		addBehaviour(new ServerMachineProvider());
+		addBehaviour(new ServerConsolidator());
  	}
 
  	public void calculateLoad()
@@ -298,5 +299,38 @@ public class ServerManagerAgent extends Agent
 				}
 			}
 		}
+ 	}
+
+ 	public class ServerConsolidator extends TickerBehaviour
+ 	{
+ 		MessageTemplate msgTemplate;
+ 		ACLMessage msg;
+ 		int count;
+ 		public ServerConsolidator()
+ 		{
+ 			super(new Agent(), 1000);
+ 			msgTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchOntology("start-server-consolidation"));
+ 		}
+ 		public void onTick()
+ 		{
+ 			msg = receive(msgTemplate);
+ 			if(msg != null)
+ 			{
+ 				count = 0;
+ 				for(int i=0; i < num_of_vms; i++)
+ 				{
+ 					if(vms[i].status == VirtualMachine.BUSY)
+ 					{
+ 						count ++;
+ 						vms[i].startMigration = true;
+ 						vms[i].migrationReason = VirtualMachine.SERVER_CONSOLIDATION;
+ 						logTextArea.append("\n\n"+new Date()+" => MIGRATION TO BE TRIGGERED FOR "+vms[i].vma_name+" TO DO SERVER CONSOLIDATION");
+ 					}
+ 				}
+ 				if(count > 0)
+ 					System.out.println(new Date()+" => Server Consolidation started for server "+ID);
+
+ 			}
+ 		}
  	}
 }

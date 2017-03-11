@@ -254,10 +254,14 @@ public class FrontEndAgent extends Agent
 						}
 					}
 				}
-				System.out.println(new Date()+"----------- Selected leader for starting server consolidation => Server "+under_utilized_servers[min].ID+" with CPU load = "+under_utilized_servers[min].cpu_load_percentage+"%, Mem load = "+under_utilized_servers[min].mem_load_percentage+"%");
-				logTextArea.append("\n"+new Date()+"----------- Selected leader for starting server consolidation => Server "+under_utilized_servers[min].ID+" with CPU load = "+under_utilized_servers[min].cpu_load_percentage+"%, Mem load = "+under_utilized_servers[min].mem_load_percentage+"%");
+				ServerMachine leader = under_utilized_servers[min];
+				System.out.println(new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%");
+				logTextArea.append("\n"+new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%");
 				//Trigger server consolidation
-
+				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+				msg.setOntology("start-server-consolidation");
+				msg.addReceiver(new AID("sma"+leader.ID, AID.ISLOCALNAME));
+				send(msg);
 				//after server consolidation
 				//turn off the server => status = NOT_UTILIZED means server is turned off
 			}

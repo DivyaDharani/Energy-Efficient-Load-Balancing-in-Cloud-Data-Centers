@@ -17,7 +17,7 @@ public class VirtualMachine
 	double cpu_usage, mem_usage;
 	JTextArea logTextArea;
 	boolean startMigration = false;
-	public static int NO_MIGRATION = 0, SERVER_OVERLOAD = 1, INSUFFICIENT_CAPACITY = 2;
+	public static int NO_MIGRATION = 0, SERVER_OVERLOAD = 1, INSUFFICIENT_CAPACITY = 2, SERVER_CONSOLIDATION = 3;
 	int migrationReason = VirtualMachine.NO_MIGRATION; 
 	int exec_time, extra_cpu_needed, extra_mem_needed;
 

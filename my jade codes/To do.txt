@@ -23,7 +23,7 @@ done =>Check cluster emptiness in VMA in Migration part
 Server Consolidation
 	done => Monitoring status of servers in FA
 	done => Leader selection in FA
-	Migration
+	done => Triggering Migration
 	Turning off servers
 	
 ERRORS to be rectified:
