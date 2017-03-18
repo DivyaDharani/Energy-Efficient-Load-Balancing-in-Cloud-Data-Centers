@@ -322,9 +322,12 @@ public class ServerManagerAgent extends Agent
  					if(vms[i].status == VirtualMachine.BUSY)
  					{
  						count ++;
- 						vms[i].startMigration = true;
- 						vms[i].migrationReason = VirtualMachine.SERVER_CONSOLIDATION;
- 						logTextArea.append("\n\n"+new Date()+" => MIGRATION TO BE TRIGGERED FOR "+vms[i].vma_name+" TO DO SERVER CONSOLIDATION");
+ 						if(vms[i].startMigration == false)
+ 						{
+ 							vms[i].startMigration = true;
+ 							vms[i].migrationReason = VirtualMachine.SERVER_CONSOLIDATION;
+ 							logTextArea.append("\n\n"+new Date()+" => MIGRATION TO BE TRIGGERED FOR "+vms[i].vma_name+" TO DO SERVER CONSOLIDATION");
+ 						}
  					}
  				}
  				if(count > 0)
