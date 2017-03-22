@@ -204,7 +204,8 @@ public class UserAgent extends Agent
 								extramem = extramem - (totalmem - 20);
 							}
 
-							timelapse = (random.nextInt(10) + 1) * 1000;
+							//timelapse = (random.nextInt(10) + 1) * 1000;
+							timelapse = i * 1000;
 
 							FileWriter fwriter = new FileWriter(file, true);
 							fwriter.write(timelapse+" "+req_no+" "+cpureq+" "+memreq+" "+exectime+" "+extracpu+" "+extramem+"\n");
@@ -243,7 +244,7 @@ public class UserAgent extends Agent
 		public void onWake()
 		{
 			sendRequest(req_no, cpureq, memreq, exectime, extracpu, extramem);
-			textArea.append("\nRequest no: "+req_no+" --> cpu: "+cpureq+" mem: "+memreq+" exectime: "+exectime);
+			textArea.append("\n"+new Date()+" Request no: "+req_no+" --> cpu: "+cpureq+" mem: "+memreq+" exectime: "+exectime);
 		}
 	}
 }

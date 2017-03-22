@@ -12,6 +12,9 @@ public class FrontEndAgent extends Agent
 	FileWriter fw;
 	ServerMachine[] serverMachines;
 	JTextArea logTextArea;
+	JTextArea textarea;
+	long[] response_time = new long[100];
+	double avg_response_time;
 	public void setup()
 	{
 		Object[] args = getArguments();
@@ -28,12 +31,24 @@ public class FrontEndAgent extends Agent
 		setEnabledO2ACommunication(true,0);
 		addBehaviour(new RequestProcessor());
 		addBehaviour(new TriggerServerMonitor());
+
+		JFrame frame = new JFrame("Response time for VM request");
+		textarea = new JTextArea();
+		textarea.setLineWrap(true);
+		textarea.setWrapStyleWord(true);
+		JScrollPane scrollPane = new JScrollPane(textarea);
+		frame.add(scrollPane);
+		frame.setVisible(true);
+		frame.setSize(600, 600);
 	}
 
 	class RequestProcessor extends CyclicBehaviour
 	{
 		Object obj;
 		int i,j;
+		long req_arrival_time = 0;
+		long vm_selection_time = 0;
+		int req_count = -1;
 		public void action()
 		{
 
@@ -41,7 +56,10 @@ public class FrontEndAgent extends Agent
 			{
 				if(obj.getClass().getSimpleName().equals("VMRequest"))
 				{
+					req_count++;
 					VMRequest vmrequest = (VMRequest)obj;
+					req_arrival_time = System.currentTimeMillis();
+					
 					try
 					{
 						vmrequest.reply_to = "fa"; //reply should be sent back to FA
@@ -149,6 +167,15 @@ public class FrontEndAgent extends Agent
 								try
 								{
 									selectedvm = vmcluster2.get(min);
+									vm_selection_time = System.currentTimeMillis();
+									response_time[req_count] = vm_selection_time - req_arrival_time;
+									if(req_count == 0) //first request
+										avg_response_time = (double)response_time[req_count];
+									else
+									{
+										avg_response_time = ((avg_response_time * req_count) + response_time[req_count]) / (req_count + 1); //calculating for each request
+									}
+									textarea.append("\n"+vmrequest.req_id+" => "+response_time[req_count]+" (Avg: "+avg_response_time+")");
 
 									str5 = "\nRequested Virtual Machine : ("+vmrequest.cpu_capacity+","+vmrequest.mem_capacity+")"+"\nVirtual Machine selected: ("+selectedvm.cpu_capacity+","+selectedvm.mem_capacity+")"+" ["+selectedvm.vma_name+"]";
 									//running the selected virtual machine
