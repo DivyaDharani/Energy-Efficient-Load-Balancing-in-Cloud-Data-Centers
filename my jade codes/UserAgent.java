@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import jade.wrapper.*;
 import java.util.*;
+import java.io.*;
 
 public class UserAgent extends Agent
 {
@@ -124,14 +125,6 @@ public class UserAgent extends Agent
 			{
 				try
 				{
-					/*String msg = "start-threshold-monitoring";
-					
-					jade.wrapper.AgentContainer container = getContainerController();
-					for(int i=1;i<=sma_count;i++)
-					{
-						AgentController agentcont = container.getAgent("sma"); //ContainerController's method - getAgent()
-						agentcont.putO2AObject(msg,false);
-					}*/
 					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 					msg.setOntology("start-threshold-monitoring");
 					for(int i=1;i<=sma_count;i++)
@@ -151,39 +144,72 @@ public class UserAgent extends Agent
 					frame.setSize(500,500);
 					frame.setVisible(true);
 					Random random = new Random();
-					int cpureq, memreq, exectime, timelapse, extracpu, extramem;
+					int cpureq = 0, memreq = 0, exectime = 0, timelapse = 0, extracpu = 0, extramem = 0;
+
+					boolean compare = false;
+					File file = new File("Requests.txt");
+					FileReader freader = new FileReader(file);
+					BufferedReader bfreader = new BufferedReader(freader);
+					if(bfreader.readLine() != null)
+						compare = true;
+					else
+						compare = false;
+					if(compare == false)
+					{
+						FileWriter fwriter = new FileWriter(file, false);
+						fwriter.write("timelapse req_no cpureq memreq exectime extracpu extramem\n");
+						fwriter.close();
+					}
 					for(int i=1;i<=50;i++)
 					{
-						req_no++;
-						cpureq = random.nextInt(8) + 1;
-						memreq = random.nextInt(20) + 1;
-						exectime = random.nextInt(10) + 1;
-
-						int cpu_bound = cpureq / 4;
-						int mem_bound = memreq / 4;
-						if(cpu_bound == 0)
-							cpu_bound = 1;
-						if(mem_bound == 0)
-							mem_bound = 1;
-						extracpu = random.nextInt(cpu_bound); //0 to half the cpu request
-						extramem = random.nextInt(mem_bound); //0 to half the mem request
-
-						int totalcpu  = cpureq + extracpu;
-						int totalmem = memreq + extramem;
-						if(totalcpu > 8)
+						if(compare == true)
 						{
-							extracpu = extracpu - (totalcpu - 8); //cpu req = 7, extra cpu needed = 4 => total cpu = 11 => this is not possible; extra cpu can only be 1 in this case so that it will make the total 8. => reduce the extra count above 8, from extra cpu needed. extra cpu = 4 - (11-8) = 1.
-							
-							//or just
-							//extracpu = 8 - cpureq;
+							String str = bfreader.readLine();
+							String[] strarr = str.split(" ");
+							timelapse = Integer.parseInt(strarr[0]);
+							req_no = Integer.parseInt(strarr[1]);
+							cpureq = Integer.parseInt(strarr[2]);
+							memreq = Integer.parseInt(strarr[3]);
+							exectime = Integer.parseInt(strarr[4]);
+							extracpu = Integer.parseInt(strarr[5]);
+							extramem = Integer.parseInt(strarr[6]);
 						}
-						if(totalmem > 20)
+						else
 						{
-							extramem = extramem - (totalmem - 20);
-						}
+							req_no++;
+							cpureq = random.nextInt(8) + 1;
+							memreq = random.nextInt(20) + 1;
+							exectime = random.nextInt(10) + 1;
 
-						timelapse = (random.nextInt(10) + 1) * 1000;
-						// timelapse = i * 1000;
+							int cpu_bound = cpureq / 4;
+							int mem_bound = memreq / 4;
+							if(cpu_bound == 0)
+								cpu_bound = 1;
+							if(mem_bound == 0)
+								mem_bound = 1;
+							extracpu = random.nextInt(cpu_bound); //0 to half the cpu request
+							extramem = random.nextInt(mem_bound); //0 to half the mem request
+
+							int totalcpu  = cpureq + extracpu;
+							int totalmem = memreq + extramem;
+							if(totalcpu > 8)
+							{
+								extracpu = extracpu - (totalcpu - 8); //cpu req = 7, extra cpu needed = 4 => total cpu = 11 => this is not possible; extra cpu can only be 1 in this case so that it will make the total 8. => reduce the extra count above 8, from extra cpu needed. extra cpu = 4 - (11-8) = 1.
+								
+								//or just
+								//extracpu = 8 - cpureq;
+							}
+							if(totalmem > 20)
+							{
+								extramem = extramem - (totalmem - 20);
+							}
+
+							timelapse = (random.nextInt(10) + 1) * 1000;
+
+							FileWriter fwriter = new FileWriter(file, true);
+							fwriter.write(timelapse+" "+req_no+" "+cpureq+" "+memreq+" "+exectime+" "+extracpu+" "+extramem+"\n");
+							fwriter.close();
+						}
 						textArea.append("\n----Req.no : "+req_no+"----Time lapse:"+timelapse+" ms");
 						addBehaviour(new AutomateRequestBehaviour(new Agent(), timelapse, req_no, cpureq, memreq, exectime, extracpu, extramem, textArea));
 					}
