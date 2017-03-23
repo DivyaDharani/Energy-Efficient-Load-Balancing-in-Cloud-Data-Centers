@@ -17,6 +17,7 @@ public class ClusteringAgent extends Agent
 	int[] incr;
 	double[] xcentroid,ycentroid;*/
 
+	VMCluster globalCluster;
 	VMCluster[] vmcluster = new VMCluster[k];
 
 	public void setup()
@@ -29,15 +30,26 @@ public class ClusteringAgent extends Agent
 
 	public class ClusterBehaviour extends OneShotBehaviour //must be cyclic behaviour or TickerBehaviour
 	{
-		
 		public void action()
 		{
 			collectDetails();
 			/*incr = new int[k]; //initial values => '0' //increment variable for each Cluster
 			xcentroid = new double[k];
 			ycentroid = new double[k];*/
+			formGlobalCluster();
 			cluster(k,iteration_count);
 		}
+
+		public void formGlobalCluster()
+		{
+			globalCluster = new VMCluster();
+			globalCluster.clusterID = 100; //random number (since IDs 0,1,2,.. will be taken by individual clusters)
+			for(int i = 0; i < vmarray.size(); i++)
+			{
+				globalCluster.add(vmarray.get(i));
+			}
+		}
+
 		public void cluster(int k,int iteration_count)
 		{
 			//k must be less than or equal to the no. of points
