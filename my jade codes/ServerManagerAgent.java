@@ -92,14 +92,27 @@ public class ServerManagerAgent extends Agent
  				int count = 0;
  				ArrayList<VirtualMachine> vmarray = new ArrayList<VirtualMachine>();
  				Object obj;
+ 				VirtualMachine vm;
+ 				int[] flag = new int[num_of_vms + 1]; //to check if a particular VMA sent VM instance or not
+ 				for(int i = 1; i <= num_of_vms; i++)
+ 					flag[i] = 0; //this means ith VMA has not sent any response yet
  				while(count < num_of_vms)
  				{
  					while((obj = getO2AObject()) == null)
  						;
  					if(obj.getClass().getSimpleName().equals("VirtualMachine"))
  					{
- 						vmarray.add((VirtualMachine)obj);
- 						count++;
+ 						vm = (VirtualMachine)obj;
+ 						if(flag[vm.local_id] == 0) //if this VM instance (vm) is not received previously
+ 						{
+	 						vmarray.add((VirtualMachine)obj);
+ 							flag[vm.local_id] = 1;
+ 							count++;
+ 						}
+ 						else 
+ 						{
+ 							System.out.println("---Prevented duplicate receipt of instance of "+vm.vma_name);
+ 						}
  					}
  				}
 
