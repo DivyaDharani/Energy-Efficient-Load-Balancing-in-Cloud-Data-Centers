@@ -15,6 +15,8 @@ public class FrontEndAgent extends Agent
 	JTextArea textarea;
 	long[] response_time = new long[100];
 	double avg_response_time;
+	int req_count = -1;
+
 	public void setup()
 	{
 		Object[] args = getArguments();
@@ -31,6 +33,7 @@ public class FrontEndAgent extends Agent
 		setEnabledO2ACommunication(true,0);
 		addBehaviour(new RequestProcessor());
 		addBehaviour(new TriggerServerMonitor());
+		addBehaviour(new AvgResetter());
 
 		JFrame frame = new JFrame("Response time for VM request");
 		textarea = new JTextArea();
@@ -42,13 +45,25 @@ public class FrontEndAgent extends Agent
 		frame.setSize(600, 600);
 	}
 
+	class AvgResetter extends CyclicBehaviour
+	{
+		public void action()
+		{
+			MessageTemplate msgTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST), MessageTemplate.MatchOntology("reset-avg"));
+			ACLMessage msg = receive(msgTemplate);
+			if(msg != null)
+			{
+				req_count = -1; //when a request comes after this, req_count will be 0. Avg will be reset by RequestProcessor behaviour when the req_count is 0.
+			}
+		}
+	}
+
 	class RequestProcessor extends CyclicBehaviour
 	{
 		Object obj;
 		int i,j;
 		long req_arrival_time = 0;
 		long vm_selection_time = 0;
-		int req_count = -1;
 		public void action()
 		{
 
@@ -170,12 +185,15 @@ public class FrontEndAgent extends Agent
 									vm_selection_time = System.currentTimeMillis();
 									response_time[req_count] = vm_selection_time - req_arrival_time;
 									if(req_count == 0) //first request
+									{
 										avg_response_time = (double)response_time[req_count];
+										textarea.append("\n\n-------------------------------------------------");
+									}
 									else
 									{
 										avg_response_time = ((avg_response_time * req_count) + response_time[req_count]) / (req_count + 1); //calculating for each request
 									}
-									textarea.append("\n"+vmrequest.req_id+" => "+response_time[req_count]+" (Avg: "+avg_response_time+")");
+									textarea.append("\n"+vmrequest.req_id+" => "+response_time[req_count]+"ms (Avg: "+avg_response_time+"ms)");
 
 									str5 = "\nRequested Virtual Machine : ("+vmrequest.cpu_capacity+","+vmrequest.mem_capacity+")"+"\nVirtual Machine selected: ("+selectedvm.cpu_capacity+","+selectedvm.mem_capacity+")"+" ["+selectedvm.vma_name+"]";
 									//running the selected virtual machine

@@ -12,6 +12,7 @@ public class UserAgent extends Agent
 {
 	int sma_count = 12;
 	int req_no = 0;
+	int req_trigger_count = 0;
 	public void setup()
 	{	
 		addBehaviour(new UserAgentGUI());
@@ -125,6 +126,20 @@ public class UserAgent extends Agent
 			{
 				try
 				{
+					req_trigger_count++;
+					if(req_trigger_count == 2)
+					{
+						ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+						msg.setOntology("process-with-global-cluster");
+						msg.addReceiver(new AID("ca", AID.ISLOCALNAME));
+						send(msg);
+
+						msg = new ACLMessage(ACLMessage.REQUEST);
+						msg.setOntology("reset-avg");
+						msg.addReceiver(new AID("fa", AID.ISLOCALNAME));
+						send(msg);
+					}
+			
 					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 					msg.setOntology("start-threshold-monitoring");
 					for(int i=1;i<=sma_count;i++)
