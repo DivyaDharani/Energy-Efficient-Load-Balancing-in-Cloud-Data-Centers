@@ -107,6 +107,7 @@ public class ServerManagerAgent extends Agent
  						{
 	 						vmarray.add((VirtualMachine)obj);
  							flag[vm.local_id] = 1;
+ 							vms[count] = vm;
  							count++;
  						}
  						else 
@@ -146,27 +147,10 @@ public class ServerManagerAgent extends Agent
 			if(msg != null)
 			{
 				System.out.println("Start-threshold-monitoring message received to sma"+ID);
-				addBehaviour(new VMInstanceGathering());
 				addBehaviour(new ThresholdSetUp());
 				addBehaviour(new ThresholdMonitoring());
 				removeBehaviour(this);
 	 		} 			
- 		}
- 	}
- 	class VMInstanceGathering extends OneShotBehaviour
- 	{
- 		Object obj = null;
- 		public void action()
- 		{
- 			for(int i = 0; i < num_of_vms; i++)
- 			{
- 				while((obj = getO2AObject()) == null)
- 					;
- 				if(obj.getClass().getSimpleName().equals("VirtualMachine"))
- 				{
- 					vms[i] = (VirtualMachine)obj;
- 				}
- 			} 			
  		}
  	}
 
