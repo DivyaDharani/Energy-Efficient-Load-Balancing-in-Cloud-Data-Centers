@@ -111,6 +111,8 @@ public class AgentStarter extends Agent
 				//creating clustering agent
 				ac[inc++] = cc.createNewAgent("ca","ClusteringAgent",null);
 				// ac.start();
+				//creating MigrationCounterAgent
+				ac[inc++] = cc.createNewAgent("migrationCounter","MigrationCounterAgent", null);
 
 				JFrame frame = new JFrame("");
 				frame.setSize(200,200);

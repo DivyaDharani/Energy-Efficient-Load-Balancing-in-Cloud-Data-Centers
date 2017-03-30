@@ -238,7 +238,14 @@ public class VirtualMachineAgent extends Agent
 						 	{
 						 		System.out.println("In VMA -> Some other object is received in place of ServerMachine object !!");
 						 	}
+
+						 	vminstance.mig_for_server_overload_count++;
 						}
+						else if(vminstance.migrationReason == VirtualMachine.INSUFFICIENT_CAPACITY)
+						{
+							vminstance.mig_for_insuff_capacity_count++;
+						}
+
 						//after migration
 						vminstance.startMigration = false;
 						vminstance.migrationReason = VirtualMachine.NO_MIGRATION;

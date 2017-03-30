@@ -122,9 +122,10 @@ public class ServerManagerAgent extends Agent
  				{
 					jade.wrapper.AgentContainer container = getContainerController(); 
 					AgentController agentcont = container.getAgent("ca"); //ContainerController's method - getAgent()
-					//agentcont.putO2AObject(strarr,false);
 					agentcont.putO2AObject(vmarray,false);
 					System.out.println("Capacity info - sent by "+getLocalName()+" to CA");
+					agentcont = container.getAgent("migrationCounter");
+					agentcont.putO2AObject(vmarray,false);
 				}
 				catch(Exception e)
 				{

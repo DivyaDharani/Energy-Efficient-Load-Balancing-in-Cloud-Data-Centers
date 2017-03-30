@@ -219,8 +219,8 @@ public class UserAgent extends Agent
 								extramem = extramem - (totalmem - 20);
 							}
 
-							//timelapse = (random.nextInt(10) + 1) * 1000;
-							timelapse = i * 1000;
+							// timelapse = (random.nextInt(10) + 1) * 1000;
+							timelapse = i * 500;
 
 							FileWriter fwriter = new FileWriter(file, true);
 							fwriter.write(timelapse+" "+req_no+" "+cpureq+" "+memreq+" "+exectime+" "+extracpu+" "+extramem+"\n");
