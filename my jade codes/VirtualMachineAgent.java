@@ -34,17 +34,6 @@ public class VirtualMachineAgent extends Agent
 		
 		vminstance = new VirtualMachine(localID,serverID,getLocalName(),cpu_capacity,mem_capacity, logTextArea);
 
-		//sending vm instance to this VMA's host's SMA
-		try
-		{
-			ContainerController container_controller = getContainerController();
-			AgentController agent_controller = container_controller.getAgent("sma"+serverID);
-			agent_controller.putO2AObject(vminstance, false);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
 		addBehaviour(new RequestGetter());
 		addBehaviour(new Migration());
 	}
