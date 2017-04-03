@@ -22,6 +22,7 @@ public class VirtualMachine
 	int exec_time, extra_cpu_needed, extra_mem_needed;
 	int mig_for_server_overload_count = 0;
 	int mig_for_insuff_capacity_count = 0;
+	int mig_for_server_consldtn_count = 0;
 
 	public VirtualMachine(int local_id,int server_id,String vma_name,int cpu_capacity,int mem_capacity, JTextArea logTextArea)
 	{

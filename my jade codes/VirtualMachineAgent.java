@@ -245,6 +245,10 @@ public class VirtualMachineAgent extends Agent
 						{
 							vminstance.mig_for_insuff_capacity_count++;
 						}
+						else if(vminstance.migrationReason == VirtualMachine.SERVER_CONSOLIDATION)
+						{
+							vminstance.mig_for_server_consldtn_count++;
+						}
 
 						//after migration
 						vminstance.startMigration = false;

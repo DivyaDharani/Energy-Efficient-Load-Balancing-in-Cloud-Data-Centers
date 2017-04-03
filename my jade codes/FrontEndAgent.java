@@ -13,7 +13,7 @@ public class FrontEndAgent extends Agent
 	ServerMachine[] serverMachines;
 	JTextArea logTextArea;
 	JTextArea textarea;
-	long[] response_time = new long[100];
+	long[] response_time = new long[500];
 	double avg_response_time;
 	int req_count = -1;
 
