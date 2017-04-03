@@ -23,6 +23,7 @@ public class VirtualMachine
 	int mig_for_server_overload_count = 0;
 	int mig_for_insuff_capacity_count = 0;
 	int mig_for_server_consldtn_count = 0;
+	String host_selection_algo = "first-fit";
 
 	public VirtualMachine(int local_id,int server_id,String vma_name,int cpu_capacity,int mem_capacity, JTextArea logTextArea)
 	{

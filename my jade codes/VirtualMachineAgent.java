@@ -15,6 +15,8 @@ public class VirtualMachineAgent extends Agent
 	public int status = 0; //0 for free; 1 for busy
 	public VirtualMachine vminstance;
 	public JTextArea logTextArea;
+	int first_fit = 1, best_fit = 0;
+
 	public void setup()
 	{
 		setEnabledO2ACommunication(true,0);
@@ -172,27 +174,32 @@ public class VirtualMachineAgent extends Agent
 							 		total_diff = cpu_diff + mem_diff;
 							 		
 							 		//finding the best fit
-							 		/*if(count == 0) //first potential VM's server
+							 		if(vminstance.host_selection_algo.equals("best-fit"))
+							 		{
+								 		if(count == 0) //first potential VM's server
+								 		{
+								 			max_diff_for = count;
+								 			max_total_diff = total_diff;
+								 		}
+								 		else
+								 		{
+								 			if(total_diff > max_total_diff)
+								 			{
+								 				max_total_diff = total_diff;
+								 				max_diff_for = count;
+								 				dummy = max_diff_for;
+								 			}
+								 		}
+								 		count++;
+							 		}
+							 		//finding the first fit (without changing the code structure of max_diff_for)
+							 		else if(vminstance.host_selection_algo.equals("first-fit"))
 							 		{
 							 			max_diff_for = count;
 							 			max_total_diff = total_diff;
+							 			count++;
+							 			break;
 							 		}
-							 		else
-							 		{
-							 			if(total_diff > max_total_diff)
-							 			{
-							 				max_total_diff = total_diff;
-							 				max_diff_for = count;
-							 				dummy = max_diff_for;
-							 			}
-							 		}
-							 		count++;*/
-
-							 		//finding the first fit (without changing the code structure of max_diff_for)
-							 		max_diff_for = count;
-							 		max_total_diff = total_diff;
-							 		count++;
-							 		break;
 							 	}
 						 	}
 						 	else

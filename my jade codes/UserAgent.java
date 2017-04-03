@@ -127,7 +127,7 @@ public class UserAgent extends Agent
 				try
 				{
 					req_trigger_count++;
-					if(req_trigger_count == 2)
+					if(req_trigger_count == 3)
 					{
 						ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 						msg.setOntology("process-with-global-cluster");
