@@ -4,6 +4,7 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import jade.wrapper.*;
 
 public class MigrationCounterAgent extends Agent
 {
@@ -13,15 +14,20 @@ public class MigrationCounterAgent extends Agent
 	int prev_mig1_count = 0, cur_mig1_count = 0; //mig1_count => No. of migrations due to server overload
 	int prev_mig2_count = 0, cur_mig2_count = 0; //mig2_count => No. of migrations due to insufficient capacity of VM
 	int prev_mig3_count = 0, cur_mig3_count = 0; //mig3_count => No. of migrations due to server consolidation
-	JLabel label1, label2, label3;
+	JLabel label1, label2, label3, label4;
+	ServerMachine[] serverMachines;
+	int prev_turnoff_count = 0, cur_turnoff_count = 0;
 
 	public void setup()
 	{
+		Object[] args = getArguments();
+		serverMachines = (ServerMachine[])args[0];
+
 		setEnabledO2ACommunication(true, 0);
 		vms = new VirtualMachine[vm_count];
 
 		JFrame frame = new JFrame("MIGRATION COUNTER");
-		frame.setSize(525, 200);
+		frame.setSize(525, 250);
 		frame.setLayout(null);
 		label1 = new JLabel();
 		label1.setFont(new Font("Serif", Font.PLAIN, 20));
@@ -42,6 +48,12 @@ public class MigrationCounterAgent extends Agent
 		label1.setText("No. of Migrations due to server overload : 0");
 		label2.setText("No. of Migrations due to VM's insufficient capacity : 0");
 		label3.setText("No. of Migrations due to server consolidation : 0");
+
+		label4 = new JLabel("No. of servers turned off by server consolidation : 0");
+		label4.setFont(new Font("Serif", Font.PLAIN, 20));
+		label4.setHorizontalAlignment(JLabel.CENTER);		
+		label4.setBounds(10, 115, 500, 50);
+		frame.add(label4);
 
 		addBehaviour(new VMInstanceGathering());
 		addBehaviour(new MigrationCounter());
@@ -74,6 +86,18 @@ public class MigrationCounterAgent extends Agent
  				}
  			}
 
+ 			try
+ 			{
+ 				//sending VM array vms[] to UA (to reset migration count for every set of requests)
+ 				jade.wrapper.AgentContainer agentContainer = getContainerController();
+  				AgentController agentController = agentContainer.getAgent("ua");
+      			agentController.putO2AObject(vms, false);
+      		}
+      		catch(Exception e)
+      		{
+      			e.printStackTrace();	
+      		}
+
  			selectHostSelectionAlgo();
  		}
  	}
@@ -81,9 +105,8 @@ public class MigrationCounterAgent extends Agent
 	public void selectHostSelectionAlgo()
 	{
 		JFrame frame = new JFrame("Host Selection Algo Selector");
-		frame.setSize(500, 500);
+		frame.setSize(500, 200);
 		frame.setVisible(true);
-		frame.setLayout(new BorderLayout());
 		JButton firstfit_button = new JButton("First Fit");
 		firstfit_button.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e)
@@ -104,8 +127,11 @@ public class MigrationCounterAgent extends Agent
 				}
 			}
 		});
-		frame.add(firstfit_button, BorderLayout.WEST);
-		frame.add(bestfit_button, BorderLayout.EAST);
+		frame.setLayout(new FlowLayout());
+		firstfit_button.setPreferredSize(new Dimension(150,150));
+		bestfit_button.setPreferredSize(new Dimension(150,150));
+		frame.add(firstfit_button);
+		frame.add(bestfit_button);
 	}
 
 	class MigrationCounter extends CyclicBehaviour
@@ -136,6 +162,18 @@ public class MigrationCounterAgent extends Agent
 			{
 				label3.setText("No. of Migrations due to server consolidation : "+cur_mig3_count);
 				prev_mig3_count = cur_mig3_count;
+			}
+
+			//No. of servers turned off due to server consolidation
+			cur_turnoff_count = 0;
+			for(int i = 0; i < sma_count; i++)
+			{
+				cur_turnoff_count += serverMachines[i].turnoff_count;
+			}
+			if(cur_turnoff_count != prev_turnoff_count)
+			{
+				label4.setText("No. of servers turned off by server consolidation : "+cur_turnoff_count);
+				prev_turnoff_count = cur_turnoff_count;
 			}
 		}
 	}

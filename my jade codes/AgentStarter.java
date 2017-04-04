@@ -52,9 +52,6 @@ public class AgentStarter extends Agent
 				
 				cc = getContainerController(); //method of Agent class
 				inc = 0;
-				//creating user agent
-				ac[inc++] = cc.createNewAgent("ua","UserAgent",null);
-				// ac.start();
 
 				/*//creating server manager agents
 				for(i=1;i<=sma;i++)
@@ -105,6 +102,9 @@ public class AgentStarter extends Agent
 						// ac.start();
 					}
 				}
+				//creating user agent
+				ac[inc++] = cc.createNewAgent("ua","UserAgent",new Object[]{serverMachines});
+				// ac.start();
 				//creating front end agent
 				ac[inc++] = cc.createNewAgent("fa","FrontEndAgent",new Object[]{serverMachines, logTextArea});
 				// ac.start();
@@ -112,7 +112,7 @@ public class AgentStarter extends Agent
 				ac[inc++] = cc.createNewAgent("ca","ClusteringAgent",null);
 				// ac.start();
 				//creating MigrationCounterAgent
-				ac[inc++] = cc.createNewAgent("migrationCounter","MigrationCounterAgent", null);
+				ac[inc++] = cc.createNewAgent("migrationCounter","MigrationCounterAgent", new Object[]{serverMachines});
 
 				JFrame frame = new JFrame("");
 				frame.setSize(200,200);

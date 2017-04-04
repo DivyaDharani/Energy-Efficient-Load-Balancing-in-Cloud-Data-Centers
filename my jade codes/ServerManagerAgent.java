@@ -329,8 +329,10 @@ public class ServerManagerAgent extends Agent
  					}
  				}
  				if(count > 0)
+ 				{
  					System.out.println(new Date()+" => Server Consolidation started for server "+ID);
-
+ 					serverMachine.turnoff_count ++;
+ 				}
  			}
  		}
  	}

@@ -11,11 +11,20 @@ import java.io.*;
 public class UserAgent extends Agent
 {
 	int sma_count = 12;
+	int vm_count = 72;
 	int req_no = 0;
 	int req_trigger_count = 0;
+	ServerMachine[] serverMachines;
+	VirtualMachine[] virtualMachines;
+
 	public void setup()
 	{	
+		setEnabledO2ACommunication(true, 0);
+		Object[] args = getArguments();
+		serverMachines = (ServerMachine[])args[0];
 		addBehaviour(new UserAgentGUI());
+		addBehaviour(new VMInstanceGetter());
+
 		automateRequests();
 	}
 	
@@ -116,6 +125,17 @@ public class UserAgent extends Agent
 		}
 	}
 
+	class VMInstanceGetter extends OneShotBehaviour
+	{
+		Object obj = null;
+		public void action()
+		{
+			while((obj = getO2AObject()) == null)
+				;
+			virtualMachines = (VirtualMachine[])obj;
+		}
+	}
+
 	public void automateRequests()
 	{
 		JFrame frame = new JFrame("");
@@ -126,6 +146,19 @@ public class UserAgent extends Agent
 			{
 				try
 				{
+					//reset turnoff count for each server (for server consolidation) for each new set of requests
+					for(int i = 0; i < sma_count; i++)
+					{
+						serverMachines[i].turnoff_count = 0;
+					}
+					//reset migration count for each VM
+					for(int i = 0; i < vm_count; i++)
+					{
+						virtualMachines[i].mig_for_server_overload_count = 0;
+						virtualMachines[i].mig_for_insuff_capacity_count = 0;
+						virtualMachines[i].mig_for_server_consldtn_count = 0;
+					}
+
 					req_trigger_count++;
 					if(req_trigger_count == 3)
 					{
