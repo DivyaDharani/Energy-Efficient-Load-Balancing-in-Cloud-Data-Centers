@@ -49,7 +49,7 @@ public class MigrationCounterAgent extends Agent
 		label2.setText("No. of Migrations due to VM's insufficient capacity : 0");
 		label3.setText("No. of Migrations due to server consolidation : 0");
 
-		label4 = new JLabel("No. of servers turned off by server consolidation : 0");
+		label4 = new JLabel("No. of times servers are turned off by server consolidation : 0");
 		label4.setFont(new Font("Serif", Font.PLAIN, 20));
 		label4.setHorizontalAlignment(JLabel.CENTER);		
 		label4.setBounds(10, 115, 500, 50);
@@ -172,7 +172,7 @@ public class MigrationCounterAgent extends Agent
 			}
 			if(cur_turnoff_count != prev_turnoff_count)
 			{
-				label4.setText("No. of servers turned off by server consolidation : "+cur_turnoff_count);
+				label4.setText("No. of times servers are turned off by server consolidation : "+cur_turnoff_count);
 				prev_turnoff_count = cur_turnoff_count;
 			}
 		}

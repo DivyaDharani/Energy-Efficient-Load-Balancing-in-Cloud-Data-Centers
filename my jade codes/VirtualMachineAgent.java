@@ -15,6 +15,7 @@ public class VirtualMachineAgent extends Agent
 	public int status = 0; //0 for free; 1 for busy
 	public VirtualMachine vminstance;
 	public JTextArea logTextArea;
+	public ServerMachine serverMachine;
 	int first_fit = 1, best_fit = 0;
 
 	public void setup()
@@ -29,7 +30,8 @@ public class VirtualMachineAgent extends Agent
 			serverID = (Integer)args[2];
 			cpu_capacity = (Integer)args[3];
 			mem_capacity = (Integer)args[4];
-			logTextArea = (JTextArea)args[5];			
+			logTextArea = (JTextArea)args[5];
+			serverMachine = (ServerMachine)args[6];
 		}
 		// JOptionPane.showMessageDialog(null,getLocalName()+" at "+getAID()+" started");
 		// System.out.println(getLocalName()+" with ID "+ID+" in Server "+serverID+" is started with mem_capacity : "+mem_capacity+" cpu_capacity : "+cpu_capacity);
@@ -165,7 +167,7 @@ public class VirtualMachineAgent extends Agent
 						 		double cpu_diff = cpu_load_threshold_percentage - cpu_load_percentage;
 						 		double mem_diff = mem_load_threshold_percentage - mem_load_percentage;
 
-						 		if(cpu_diff >= 0 && mem_diff >= 0)//checking if it exceeds the threshold
+						 		if(cpu_diff >= 0 && mem_diff >= 0 && (vminstance.migrationReason != VirtualMachine.SERVER_CONSOLIDATION || sm.status != ServerMachine.NOT_UTILIZED))//checking if it exceeds the threshold or not and checking this condition: if migration reason is server consolidation, host server must not be having "not_utilized" status(logic: just for turning a server off, another server must not be turned on from turned off state)
 						 		{
 						 			//this server will not be overloaded even when the job is migrated to it; so include the concerned VM and the server 
 						 			serverMachines[count] = sm;
@@ -210,7 +212,15 @@ public class VirtualMachineAgent extends Agent
 					}
 					if(count == 0) //no capable VM is free; so try next time (some VM may complete the job and it may become free)
 					{
-						System.out.println("No potential server found - for migration of job from "+vma_name);
+						if(vminstance.migrationReason == VirtualMachine.SERVER_CONSOLIDATION)
+						{
+							vminstance.startMigration = false;
+							vminstance.migrationReason = VirtualMachine.NO_MIGRATION;
+							serverMachine.turnoff_count--; //since turnoff count would have been incremented before the start of migrations for consolidation, it has to be decremented now as consolidation is cancelled for this server
+							System.out.println("Server "+serverID+" is prevented from performing server consolidation as no potential active servers are found");
+						}
+						else
+							System.out.println("No potential server found - for migration of job from "+vma_name);
 						return;
 					}
 					//count > 0 // at least one server and a VM in it are found
@@ -223,6 +233,7 @@ public class VirtualMachineAgent extends Agent
 					if(selected_vm.status == VirtualMachine.FREE) //checking if the selected VM is still free
 					{
 						logTextArea.append("\n\n"+new Date()+" -> SELECTED SERVER : "+selected_server.ID+"; SELECTED VM: "+selected_vm.vma_name+" => FOR THE JOB IN VM "+vma_name+"\n");
+						System.out.println("\n"+new Date()+" -> SELECTED SERVER : "+selected_server.ID+"; SELECTED VM: "+selected_vm.vma_name+" => FOR THE JOB IN VM "+vma_name+"\n");
 						//migration can be done
 						selected_vm.runMachine(vmrequest);
 						//to notify this VM's server about successful migration 

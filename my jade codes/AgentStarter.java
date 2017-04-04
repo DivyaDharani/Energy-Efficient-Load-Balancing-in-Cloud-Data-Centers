@@ -97,8 +97,8 @@ public class AgentStarter extends Agent
 					for(k=0;k<j;k++)
 					{
 						//vm's local name => vma_<server's id>_<vm's local id in the server>
-						ac[inc++] = cc.createNewAgent("vma_"+i+"_"+(k+1),"VirtualMachineAgent", new Object[]{vminc++,k+1,i,Integer.parseInt(cpuarr[k]),Integer.parseInt(memarr[k]), logTextArea});
-						//passing vm's ID, cpu capacity and mem capacity
+						ac[inc++] = cc.createNewAgent("vma_"+i+"_"+(k+1),"VirtualMachineAgent", new Object[]{vminc++,k+1,i,Integer.parseInt(cpuarr[k]),Integer.parseInt(memarr[k]), logTextArea, serverMachines[server_count - 1]});
+						//passing vm's ID, cpu capacity, mem capacity and ServerMachine instance
 						// ac.start();
 					}
 				}

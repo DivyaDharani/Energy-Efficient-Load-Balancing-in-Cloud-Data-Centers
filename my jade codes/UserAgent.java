@@ -208,7 +208,7 @@ public class UserAgent extends Agent
 						fwriter.write("timelapse req_no cpureq memreq exectime extracpu extramem\n");
 						fwriter.close();
 					}
-					for(int i=1;i<=50;i++)
+					for(int i=1;i<=100;i++)
 					{
 						if(compare == true)
 						{

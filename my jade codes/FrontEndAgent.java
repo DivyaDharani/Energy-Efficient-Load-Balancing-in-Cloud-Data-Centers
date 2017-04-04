@@ -16,6 +16,7 @@ public class FrontEndAgent extends Agent
 	long[] response_time = new long[500];
 	double avg_response_time;
 	int req_count = -1;
+	int server_count = 12;
 
 	public void setup()
 	{
@@ -280,7 +281,11 @@ public class FrontEndAgent extends Agent
 			System.out.println();
 			int min = 0, min_total_load = 0;
 			//Leader Selection
-			if(under_count > 0)
+			if(under_count == 1 && not_count == server_count - 1) //only one server is active and that server is under utilized
+			{
+				//no server consolidation
+			}
+			else if(under_count > 0)
 			{
 				for(i = 0; i < under_count; i++)
 				{
