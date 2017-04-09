@@ -167,7 +167,7 @@ public class VirtualMachineAgent extends Agent
 						 		double cpu_diff = cpu_load_threshold_percentage - cpu_load_percentage;
 						 		double mem_diff = mem_load_threshold_percentage - mem_load_percentage;
 
-						 		if(cpu_diff >= 0 && mem_diff >= 0 && (vminstance.migrationReason != VirtualMachine.SERVER_CONSOLIDATION || sm.status != ServerMachine.NOT_UTILIZED))//checking if it exceeds the threshold or not and checking this condition: if migration reason is server consolidation, host server must not be having "not_utilized" status(logic: just for turning a server off, another server must not be turned on from turned off state)
+						 		if(sm.ID != serverID && cpu_diff >= 0 && mem_diff >= 0 && (vminstance.migrationReason != VirtualMachine.SERVER_CONSOLIDATION || sm.status != ServerMachine.NOT_UTILIZED))//checking if it exceeds the threshold or not and checking this condition: if migration reason is server consolidation, host server must not be having "not_utilized" status(logic: just for turning a server off, another server must not be turned on from turned off state)
 						 		{
 						 			//this server will not be overloaded even when the job is migrated to it; so include the concerned VM and the server 
 						 			serverMachines[count] = sm;

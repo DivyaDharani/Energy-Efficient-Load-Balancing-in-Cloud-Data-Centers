@@ -2,6 +2,8 @@ import jade.core.*;
 import jade.core.behaviours.*;
 import jade.lang.acl.*;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import jade.wrapper.*;
 import java.io.*;
 import java.util.*;
@@ -13,10 +15,11 @@ public class FrontEndAgent extends Agent
 	ServerMachine[] serverMachines;
 	JTextArea logTextArea;
 	JTextArea textarea;
-	long[] response_time = new long[500];
+	long[] response_time = new long[600];
 	double avg_response_time;
 	int req_count = -1;
 	int server_count = 12;
+	boolean leader_method = true;
 
 	public void setup()
 	{
@@ -44,6 +47,8 @@ public class FrontEndAgent extends Agent
 		frame.add(scrollPane);
 		frame.setVisible(true);
 		frame.setSize(600, 600);
+
+		consolidationMethodSelector();
 	}
 
 	class AvgResetter extends CyclicBehaviour
@@ -241,6 +246,34 @@ public class FrontEndAgent extends Agent
 			}
 		}
 	}
+
+	public void consolidationMethodSelector()
+	{
+		JFrame frame = new JFrame("Consolidation Method Selector");
+		frame.setSize(500, 200);
+		frame.setVisible(true);
+		JButton leader_button = new JButton("With Leader Selection");
+		leader_button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				leader_method = true;
+			}
+		});
+		JButton no_leader_button = new JButton("Without Leader Selection");
+		no_leader_button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				leader_method = false;
+			}
+		});
+		frame.setLayout(new FlowLayout());
+		leader_button.setPreferredSize(new Dimension(150,150));
+		no_leader_button.setPreferredSize(new Dimension(150,150));
+		frame.add(leader_button);
+		frame.add(no_leader_button);
+		
+	}
+
 	class ServerMonitor extends TickerBehaviour 
 	{
 		ServerMachine[] under_utilized_servers, not_utilized_servers;
@@ -256,65 +289,98 @@ public class FrontEndAgent extends Agent
 			not_utilized_servers = new ServerMachine[serverMachines.length];
 			under_count = 0;
 			not_count = 0;
-			for(i = 0; i < serverMachines.length; i++)
+
+			if(leader_method == true)
 			{
-				if(serverMachines[i].status == ServerMachine.NOT_UTILIZED)
+				for(i = 0; i < serverMachines.length; i++)
 				{
-					not_utilized_servers[not_count++] = serverMachines[i];
+					if(serverMachines[i].status == ServerMachine.NOT_UTILIZED)
+					{
+						not_utilized_servers[not_count++] = serverMachines[i];
+					}
+					else if(serverMachines[i].status == ServerMachine.UNDER_UTILIZED)
+					{
+						under_utilized_servers[under_count++] = serverMachines[i];
+					}
 				}
-				else if(serverMachines[i].status == ServerMachine.UNDER_UTILIZED)
-				{
-					under_utilized_servers[under_count++] = serverMachines[i];
-				}
-			}
-			System.out.println(new Date()+" => Underutilized server list: ");
-			for(i = 0; i < under_count; i++)
-			{
-				System.out.print("\t"+under_utilized_servers[i].ID);
-			}
-			System.out.println();
-			System.out.println(new Date()+" => Not utilized server list: ");
-			for(i = 0; i < not_count; i++)
-			{
-				System.out.print("\t"+not_utilized_servers[i].ID);
-			}
-			System.out.println();
-			int min = 0, min_total_load = 0;
-			//Leader Selection
-			if(under_count == 1 && not_count == server_count - 1) //only one server is active and that server is under utilized
-			{
-				//no server consolidation
-			}
-			else if(under_count > 0)
-			{
+				System.out.println(new Date()+" => Underutilized server list: ");
 				for(i = 0; i < under_count; i++)
 				{
-					total_load = under_utilized_servers[i].cpu_load + under_utilized_servers[i].mem_load;
-					if(i == 0)
+					System.out.print("\t"+under_utilized_servers[i].ID);
+				}
+				System.out.println();
+				System.out.println(new Date()+" => Not utilized server list: ");
+				for(i = 0; i < not_count; i++)
+				{
+					System.out.print("\t"+not_utilized_servers[i].ID);
+				}
+				System.out.println();
+				int min = 0, min_total_load = 0;
+				//Leader Selection
+				if(under_count == 1 && not_count == server_count - 1) //only one server is active and that server is under utilized
+				{
+					//no server consolidation
+				}
+				else if(under_count > 0)
+				{
+					for(i = 0; i < under_count; i++)
 					{
-						min = 0;
-						min_total_load = total_load;
-					}
-					else
-					{
-						if(total_load < min_total_load)
+						total_load = under_utilized_servers[i].cpu_load + under_utilized_servers[i].mem_load;
+						if(i == 0)
 						{
+							min = 0;
 							min_total_load = total_load;
-							min = i;
+						}
+						else
+						{
+							if(total_load < min_total_load)
+							{
+								min_total_load = total_load;
+								min = i;
+							}
 						}
 					}
+					ServerMachine leader = under_utilized_servers[min];
+					System.out.println(new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%");
+					logTextArea.append("\n"+new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%");
+					//Trigger server consolidation
+					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+					msg.setOntology("start-server-consolidation");
+					msg.addReceiver(new AID("sma"+leader.ID, AID.ISLOCALNAME));
+					send(msg);
+					//after server consolidation
+					//turn off the server => status = NOT_UTILIZED means server is turned off
+					//if the load is 0, the status is set as NOT_UTILIZED in ThresholdMonitoring behaviour of SMA
 				}
-				ServerMachine leader = under_utilized_servers[min];
-				System.out.println(new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%");
-				logTextArea.append("\n"+new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%");
-				//Trigger server consolidation
-				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-				msg.setOntology("start-server-consolidation");
-				msg.addReceiver(new AID("sma"+leader.ID, AID.ISLOCALNAME));
-				send(msg);
-				//after server consolidation
-				//turn off the server => status = NOT_UTILIZED means server is turned off
-				//if the load is 0, the status is set as NOT_UTILIZED in ThresholdMonitoring behaviour of SMA
+			}
+			else //Without leader selection
+			{
+				for(i = 0; i < serverMachines.length; i++)
+				{
+					if(serverMachines[i].status == ServerMachine.NOT_UTILIZED)
+					{
+						not_utilized_servers[not_count++] = serverMachines[i];
+					}
+					else if(serverMachines[i].status == ServerMachine.UNDER_UTILIZED)
+					{
+						System.out.println(new Date()+" => Underutilized server found: Server"+serverMachines[i].ID);
+						ServerMachine leader = serverMachines[i];
+						System.out.println(new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%");
+						logTextArea.append("\n"+new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%");
+						//Trigger server consolidation
+						ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+						msg.setOntology("start-server-consolidation");
+						msg.addReceiver(new AID("sma"+leader.ID, AID.ISLOCALNAME));
+						send(msg);
+					}
+				}
+				System.out.println();
+				System.out.println(new Date()+" => Not utilized server list: ");
+				for(i = 0; i < not_count; i++)
+				{
+					System.out.print("\t"+not_utilized_servers[i].ID);
+				}
+				System.out.println();
 			}
 		}
 	}

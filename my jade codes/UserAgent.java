@@ -253,7 +253,7 @@ public class UserAgent extends Agent
 							}
 
 							// timelapse = (random.nextInt(10) + 1) * 1000;
-							timelapse = i * 500;
+							timelapse = i * 300;
 
 							FileWriter fwriter = new FileWriter(file, true);
 							fwriter.write(timelapse+" "+req_no+" "+cpureq+" "+memreq+" "+exectime+" "+extracpu+" "+extramem+"\n");
