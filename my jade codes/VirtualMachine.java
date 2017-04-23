@@ -7,6 +7,7 @@ public class VirtualMachine
 {
 	int local_id,server_id;
 	int cpu_capacity,mem_capacity;
+	int bandwidth;
 	public static int BUSY = 1, FREE = 0;
 	int status = VirtualMachine.FREE;
 	int cpu_occupied = 0,mem_occupied = 0; 
