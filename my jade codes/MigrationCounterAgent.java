@@ -99,6 +99,7 @@ public class MigrationCounterAgent extends Agent
       		}
 
  			selectHostSelectionAlgo();
+ 			VMSelectionAlgoChooser();
  		}
  	}
 
@@ -133,6 +134,74 @@ public class MigrationCounterAgent extends Agent
 		frame.add(firstfit_button);
 		frame.add(bestfit_button);
 	}
+
+	public void VMSelectionAlgoChooser()
+ 	{
+ 		JFrame frame = new JFrame("VM Selection Algo Selector");
+		frame.setSize(1000, 200);
+		frame.setVisible(true);
+		JButton cpu_button = new JButton("CPU Method");
+		cpu_button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				for(int i = 0; i < sma_count; i++)
+					serverMachines[i].vm_selection = "cpu_method";
+			}
+		});
+		JButton memory_button = new JButton("Memory Method");
+		memory_button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				for(int i = 0; i < sma_count; i++)
+					serverMachines[i].vm_selection = "memory_method";
+			}
+		});
+		JButton combined_cpu_mem_button = new JButton("Combined CPU and Memory method");
+		combined_cpu_mem_button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				for(int i = 0; i < sma_count; i++)
+					serverMachines[i].vm_selection = "combined_cpu_mem_method";
+			}
+		});
+		JButton middle_vm_button = new JButton("Middle VM method");
+		middle_vm_button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				for(int i = 0; i < sma_count; i++)
+					serverMachines[i].vm_selection = "middle_vm_method";
+			}
+		});
+		JButton mig_time_button = new JButton("Migration time method");
+		mig_time_button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				for(int i = 0; i < sma_count; i++)
+					serverMachines[i].vm_selection = "mig_time_method";
+			}
+		});
+		JButton mig_time_middle_vm_button = new JButton("Migration time - Middle VM method");
+		mig_time_middle_vm_button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				for(int i = 0; i < sma_count; i++)
+					serverMachines[i].vm_selection = "mig_time_middle_vm_method";
+			}
+		});
+		frame.setLayout(new FlowLayout());
+		cpu_button.setPreferredSize(new Dimension(150,150));
+		memory_button.setPreferredSize(new Dimension(150,150));
+		combined_cpu_mem_button.setPreferredSize(new Dimension(150,150));
+		middle_vm_button.setPreferredSize(new Dimension(150,150));
+		mig_time_button.setPreferredSize(new Dimension(150,150));
+		mig_time_middle_vm_button.setPreferredSize(new Dimension(150,150));
+		frame.add(cpu_button);
+		frame.add(memory_button);
+		frame.add(combined_cpu_mem_button);
+		frame.add(middle_vm_button);
+		frame.add(mig_time_button);
+		frame.add(mig_time_middle_vm_button);
+ 	}
 
 	class MigrationCounter extends CyclicBehaviour
 	{

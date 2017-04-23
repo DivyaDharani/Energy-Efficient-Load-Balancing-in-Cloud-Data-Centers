@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.util.*;
 import java.io.*;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
 public class ServerManagerAgent extends Agent
 {
 	int ID, num_of_vms, total_cpu, total_mem;
@@ -16,6 +19,7 @@ public class ServerManagerAgent extends Agent
 	VirtualMachine[] vms; 
 	ServerMachine serverMachine;
 	JTextArea logTextArea;
+
 	public void setup()
 	{
 		setEnabledO2ACommunication(true,0);
@@ -38,12 +42,14 @@ public class ServerManagerAgent extends Agent
  	{
  		cpu_load = 0;
  		mem_load = 0;
+ 		serverMachine.busy_vm_count = 0;
  		for(int i = 0; i < num_of_vms; i++)
  		{
  			if(vms[i].status == VirtualMachine.BUSY)
  			{
- 				cpu_load += vms[i].cpu_occupied; //total load of all VMs
- 				mem_load += vms[i].mem_occupied;	
+ 				cpu_load += (vms[i].core_usage_percentage / 100.0 ) * vms[i].cpu_occupied; //total load of all VMs
+ 				mem_load += vms[i].mem_occupied;
+ 				serverMachine.busy_vm_count ++;
  			}
  		}
  		cpu_load_percentage = ((1.0 * cpu_load) / total_cpu) * 100;
@@ -162,10 +168,10 @@ public class ServerManagerAgent extends Agent
  			//load related thresholds
  			//threshold specific to the capacity of this server
  			serverMachine.cpu_load_threshold = cpu_load_threshold = 0.75 * total_cpu;
- 			serverMachine.mem_load_threshold = mem_load_threshold = 0.75 * total_mem;
+ 			serverMachine.mem_load_threshold = mem_load_threshold = 0.70 * total_mem;
  			//threshold based on usage percentage => 75%
  			serverMachine.cpu_load_threshold_percentage = cpu_load_threshold_percentage = 75;
- 			serverMachine.mem_load_threshold_percentage = mem_load_threshold_percentage = 75;
+ 			serverMachine.mem_load_threshold_percentage = mem_load_threshold_percentage = 70;
 
  			//energy related thresholds
  			serverMachine.cpu_energy_threshold = cpu_energy_threshold = 0.25 * total_cpu;
@@ -192,7 +198,7 @@ public class ServerManagerAgent extends Agent
  			{
  				serverMachine.status = ServerMachine.UNDER_UTILIZED;
  			}
- 			else if(cpu_load_percentage > cpu_load_threshold_percentage || mem_load_percentage > mem_load_threshold_percentage)
+ 			else if((cpu_load_percentage > cpu_load_threshold_percentage || mem_load_percentage > mem_load_threshold_percentage) && !serverMachine.vm_selection.equals("mig_time_method"))
  			{
  				serverMachine.status = ServerMachine.OVER_UTILIZED;
  				//trigger migration 
@@ -201,16 +207,19 @@ public class ServerManagerAgent extends Agent
  				//choosing VM for migration
  				VirtualMachine[] vm_temp = new VirtualMachine[num_of_vms];
  				int busy_vm_count = 0, i, j;
+ 				VirtualMachine selected_vm = null;
  				//considering only those VMs that are engaged with a job
  				for(i = 0; i < num_of_vms; i++)
  				{
  					if(vms[i].status == VirtualMachine.BUSY)
  						vm_temp[busy_vm_count++] = vms[i]; 
  				}
- 				double temp;
+ 				VirtualMachine temp;
  				for(i = 0; i < busy_vm_count; i++)
  				{
- 					vm_temp[i].cpu_usage = vm_temp[i].cpu_occupied / (vm_temp[i].cpu_capacity * 1.0);
+ 					//usage with respect to the VM's server's usage
+ 					vm_temp[i].cpu_usage = (((vm_temp[i].core_usage_percentage / 100.0) * vm_temp[i].cpu_occupied) / (cpu_load * 1.0)) * 100.0;
+ 					vm_temp[i].mem_usage = (vm_temp[i].mem_occupied / (mem_load * 1.0)) * 100.0;
  				}
  				//sorting acc. to cpu usage
  				for(i = 0; i < busy_vm_count - 1; i++)
@@ -219,51 +228,124 @@ public class ServerManagerAgent extends Agent
  					{
  						if(vm_temp[i].cpu_usage > vm_temp[j].cpu_usage)
  						{
- 							temp = vm_temp[i].cpu_usage;
- 							vm_temp[i].cpu_usage = vm_temp[j].cpu_usage;
- 							vm_temp[j].cpu_usage = vm_temp[i].cpu_usage;
+ 							temp = vm_temp[i];
+ 							vm_temp[i] = vm_temp[j];
+ 							vm_temp[j] = temp;
  						}
  					}
  				}
- 				//assigning cpu weights
+ 				if(serverMachine.vm_selection.equals("cpu_method"))
+ 				{
+ 					selected_vm = vm_temp[busy_vm_count-1]; //last VM in the sorted list (highest CPU usage value)
+ 				}
+ 				else
+ 				{
+	 				//assigning cpu weights
+	 				for(i = 0; i < busy_vm_count; i++)
+	 				{
+	 					vm_temp[i].cpu_weight = i+1;
+	 				}
+	 				//sorting acc. to memory usage
+	 				for(i = 0; i < busy_vm_count - 1; i++)
+	 				{
+	 					for(j = i; j < busy_vm_count; j++)
+	 					{
+	 						if(vm_temp[i].mem_usage > vm_temp[j].mem_usage)
+	 						{
+	 							temp = vm_temp[i];
+	 							vm_temp[i] = vm_temp[j];
+	 							vm_temp[j] = temp;
+	 						}
+	 					}
+	 				}
+	 				if(serverMachine.vm_selection.equals("memory_method"))
+	 				{
+	 					selected_vm = vm_temp[busy_vm_count - 1]; //last VM in the sorted list (highest mem usage value)
+	 				}
+	 				else
+	 				{
+		 				//assigning memory weights
+		 				for(i = 0; i < busy_vm_count; i++)
+		 				{
+		 					vm_temp[i].mem_weight = i+1;
+		 					vm_temp[i].total_weight = vm_temp[i].cpu_weight + vm_temp[i].mem_weight;
+		 				}
+		 				//sorting acc. to total_weight
+		 				for(i = 0; i < busy_vm_count - 1; i++)
+		 				{
+		 					for(j = i; j < busy_vm_count; j++)
+		 					{
+		 						if(vm_temp[i].total_weight > vm_temp[j].total_weight)
+		 						{
+		 							temp = vm_temp[i];
+		 							vm_temp[i] = vm_temp[j];
+		 							vm_temp[j] = temp;
+		 						}
+		 					}
+		 				}
+		 				if(serverMachine.vm_selection.equals("combined_cpu_mem_method"))
+		 				{
+		 					selected_vm = vm_temp[busy_vm_count - 1];
+		 				}
+		 				else if(serverMachine.vm_selection.equals("middle_vm_method"))
+		 				{
+		 					//choosing the middle VM in the new order
+		 					selected_vm = vm_temp[num_of_vms / 2];
+		 				}
+		 			}
+ 				}
+ 				serverMachine.migration_triggered = true;//to avoid triggering the same computation again and again when the server's threshold is exceeded
+ 				logTextArea.append("\n\nSelected VM from server "+ID+" for migration => "+selected_vm.vma_name+"\n");
+ 				selected_vm.startMigration = true;
+ 				selected_vm.migrationReason = VirtualMachine.SERVER_OVERLOAD;
+ 				//calculate remaining execution time 
+ 			}
+ 			else if((cpu_load_percentage >= cpu_load_threshold_percentage) && serverMachine.vm_selection.equals("mig_time_method") || serverMachine.vm_selection.equals("mig_time_middle_vm_method"))
+ 			{
+ 				serverMachine.status = ServerMachine.OVER_UTILIZED;
+ 				//trigger migration 
+ 				logTextArea.append("\n\n"+new Date()+" => MIGRATION TO BE TRIGGERED FOR SERVER "+ID+" (CPU load % = "+cpu_load_percentage+", Mem load % = "+mem_load_percentage+")\n");
+ 				
+ 				//choosing VM for migration
+ 				VirtualMachine[] vm_temp = new VirtualMachine[num_of_vms];
+ 				int busy_vm_count = 0, i, j;
+ 				VirtualMachine selected_vm = null;
+ 				//considering only those VMs that are engaged with a job
+ 				for(i = 0; i < num_of_vms; i++)
+ 				{
+ 					if(vms[i].status == VirtualMachine.BUSY)
+ 						vm_temp[busy_vm_count++] = vms[i]; 
+ 				}
+ 				VirtualMachine temp;
+ 				double mig_time;
+ 				double[] mig_weight = new double[busy_vm_count];
  				for(i = 0; i < busy_vm_count; i++)
  				{
- 					vm_temp[i].cpu_weight = i+1;
+ 					//usage with respect to the VM's server's usage
+ 					vm_temp[i].cpu_usage = (((vm_temp[i].core_usage_percentage / 100.0) * vm_temp[i].cpu_occupied) / (cpu_load * 1.0)) * 100.0;
+ 					vm_temp[i].mem_usage = (vm_temp[i].mem_occupied / (mem_load * 1.0)) * 100.0;
+
+ 					mig_time = vm_temp[i].mem_usage / vm_temp[i].bandwidth;
+ 					mig_weight[i] = vm_temp[i].cpu_usage / mig_time;
  				}
- 				//sorting acc. to memory usage
+
+ 				//sorting acc. to mig_weight
  				for(i = 0; i < busy_vm_count - 1; i++)
  				{
  					for(j = i; j < busy_vm_count; j++)
  					{
- 						if(vm_temp[i].mem_usage > vm_temp[j].mem_usage)
+ 						if(mig_weight[i] > mig_weight[j])
  						{
- 							temp = vm_temp[i].mem_usage;
- 							vm_temp[i].mem_usage = vm_temp[j].mem_usage;
- 							vm_temp[j].mem_usage = vm_temp[i].mem_usage;
+ 							temp = vm_temp[i];
+ 							vm_temp[i] = vm_temp[j];
+ 							vm_temp[j] = temp;
  						}
  					}
  				}
- 				//assigning memory weights
- 				for(i = 0; i < busy_vm_count; i++)
- 				{
- 					vm_temp[i].mem_weight = i+1;
- 					vm_temp[i].total_weight = vm_temp[i].cpu_weight + vm_temp[i].mem_weight;
- 				}
- 				//sorting acc. to total_weight
- 				for(i = 0; i < busy_vm_count - 1; i++)
- 				{
- 					for(j = i; j < busy_vm_count; j++)
- 					{
- 						if(vm_temp[i].total_weight > vm_temp[j].total_weight)
- 						{
- 							temp = vm_temp[i].total_weight;
- 							vm_temp[i].total_weight = vm_temp[j].total_weight;
- 							vm_temp[j].total_weight = vm_temp[i].total_weight;
- 						}
- 					}
- 				}
- 				//choosing the middle VM in the new order
- 				VirtualMachine selected_vm = vm_temp[num_of_vms / 2];
+ 				if(serverMachine.vm_selection.equals("mig_time_method"))
+ 					selected_vm = vm_temp[busy_vm_count - 1];
+ 				else if(serverMachine.vm_selection.equals("mig_time_middle_vm_method"))
+ 					selected_vm = vm_temp[busy_vm_count / 2];
  				serverMachine.migration_triggered = true;//to avoid triggering the same computation again and again when the server's threshold is exceeded
  				logTextArea.append("\n\nSelected VM from server "+ID+" for migration => "+selected_vm.vma_name+"\n");
  				selected_vm.startMigration = true;

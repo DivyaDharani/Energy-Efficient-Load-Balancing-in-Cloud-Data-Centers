@@ -9,7 +9,9 @@ public class ServerMachine
 	public static int NOT_UTILIZED = 0, UNDER_UTILIZED = 1, NORMALLY_UTILIZED = 2, OVER_UTILIZED = 3;
 	int status;
 	int turnoff_count = 0;
-	
+	String vm_selection = "middle_vm_method";
+	int busy_vm_count = 0;
+
 	public ServerMachine(int ID, int num_of_vms, int total_cpu, int total_mem)
 	{
 		this.ID = ID;

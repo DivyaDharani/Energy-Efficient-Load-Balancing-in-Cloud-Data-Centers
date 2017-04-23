@@ -15,11 +15,11 @@ public class FrontEndAgent extends Agent
 	ServerMachine[] serverMachines;
 	JTextArea logTextArea;
 	JTextArea textarea;
-	long[] response_time = new long[600];
+	long[] response_time = new long[1200];
 	double avg_response_time;
 	int req_count = -1;
 	int server_count = 12;
-	boolean leader_method = true;
+	String leader_method = "new";
 
 	public void setup()
 	{
@@ -252,25 +252,25 @@ public class FrontEndAgent extends Agent
 		JFrame frame = new JFrame("Consolidation Method Selector");
 		frame.setSize(500, 200);
 		frame.setVisible(true);
-		JButton leader_button = new JButton("With Leader Selection");
+		JButton leader_button = new JButton("With Old Leader Selection");
 		leader_button.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 			{
-				leader_method = true;
+				leader_method = "old";
 			}
 		});
-		JButton no_leader_button = new JButton("Without Leader Selection");
-		no_leader_button.addActionListener(new ActionListener(){
+		JButton new_leader_button = new JButton("With New Leader Selection");
+		new_leader_button.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 			{
-				leader_method = false;
+				leader_method = "new";
 			}
 		});
 		frame.setLayout(new FlowLayout());
 		leader_button.setPreferredSize(new Dimension(150,150));
-		no_leader_button.setPreferredSize(new Dimension(150,150));
+		new_leader_button.setPreferredSize(new Dimension(150,150));
 		frame.add(leader_button);
-		frame.add(no_leader_button);
+		frame.add(new_leader_button);
 		
 	}
 
@@ -278,7 +278,6 @@ public class FrontEndAgent extends Agent
 	{
 		ServerMachine[] under_utilized_servers, not_utilized_servers;
 		int i, under_count = 0, not_count = 0; //underutilized server count and not utilized server count
-		int total_load = 0;
 		public ServerMonitor(Agent agent, long period)
 		{
 			super(agent, period);
@@ -290,8 +289,9 @@ public class FrontEndAgent extends Agent
 			under_count = 0;
 			not_count = 0;
 
-			if(leader_method == true)
+			if(leader_method == "old")
 			{
+				int total_load = 0;
 				for(i = 0; i < serverMachines.length; i++)
 				{
 					if(serverMachines[i].status == ServerMachine.NOT_UTILIZED)
@@ -341,8 +341,8 @@ public class FrontEndAgent extends Agent
 						}
 					}
 					ServerMachine leader = under_utilized_servers[min];
-					System.out.println(new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%");
-					logTextArea.append("\n"+new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%");
+					System.out.println(new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%"+"("+leader.cpu_load+","+leader.mem_load+")");
+					logTextArea.append("\n"+new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%"+"("+leader.cpu_load+","+leader.mem_load+")");
 					//Trigger server consolidation
 					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 					msg.setOntology("start-server-consolidation");
@@ -353,7 +353,7 @@ public class FrontEndAgent extends Agent
 					//if the load is 0, the status is set as NOT_UTILIZED in ThresholdMonitoring behaviour of SMA
 				}
 			}
-			else //Without leader selection
+			/*else //Without leader selection
 			{
 				for(i = 0; i < serverMachines.length; i++)
 				{
@@ -381,7 +381,73 @@ public class FrontEndAgent extends Agent
 					System.out.print("\t"+not_utilized_servers[i].ID);
 				}
 				System.out.println();
+			}*/
+			else //leader_method = "new" //novel
+			{
+				double total_load = 0;
+				for(i = 0; i < serverMachines.length; i++)
+				{
+					if(serverMachines[i].status == ServerMachine.NOT_UTILIZED)
+					{
+						not_utilized_servers[not_count++] = serverMachines[i];
+					}
+					else if(serverMachines[i].status == ServerMachine.UNDER_UTILIZED)
+					{
+						under_utilized_servers[under_count++] = serverMachines[i];
+					}
+				}
+				System.out.println(new Date()+" => Underutilized server list: ");
+				for(i = 0; i < under_count; i++)
+				{
+					System.out.print("\t"+under_utilized_servers[i].ID);
+				}
+				System.out.println();
+				System.out.println(new Date()+" => Not utilized server list: ");
+				for(i = 0; i < not_count; i++)
+				{
+					System.out.print("\t"+not_utilized_servers[i].ID);
+				}
+				System.out.println();
+				int max = 0;
+				double max_total_load = 0;
+				//Leader Selection
+				if(under_count == 1 && not_count == server_count - 1) //only one server is active and that server is under utilized
+				{
+					//no server consolidation
+				}
+				else if(under_count > 0)
+				{
+					for(i = 0; i < under_count; i++)
+					{
+						total_load = 1 / (under_utilized_servers[i].cpu_load_percentage * under_utilized_servers[i].busy_vm_count * 1.0);
+						if(i == 0)
+						{
+							max = 0;
+							max_total_load = total_load;
+						}
+						else
+						{
+							if(total_load > max_total_load)
+							{
+								max_total_load = total_load;
+								max = i;
+							}
+						}
+					}
+					ServerMachine leader = under_utilized_servers[max];
+					System.out.println(new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%"+"("+leader.cpu_load+","+leader.mem_load+")");
+					logTextArea.append("\n"+new Date()+"----------- Selected leader for starting server consolidation => Server "+leader.ID+" with CPU load = "+leader.cpu_load_percentage+"%, Mem load = "+leader.mem_load_percentage+"%"+"("+leader.cpu_load+","+leader.mem_load+")");
+					//Trigger server consolidation
+					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+					msg.setOntology("start-server-consolidation");
+					msg.addReceiver(new AID("sma"+leader.ID, AID.ISLOCALNAME));
+					send(msg);
+					//after server consolidation
+					//turn off the server => status = NOT_UTILIZED means server is turned off
+					//if the load is 0, the status is set as NOT_UTILIZED in ThresholdMonitoring behaviour of SMA
+				}
 			}
+
 		}
 	}
 

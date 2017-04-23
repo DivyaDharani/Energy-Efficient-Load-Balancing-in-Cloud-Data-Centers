@@ -14,6 +14,7 @@ public class VirtualMachine
 	int VMID,SMAID;
 	String vma_name;
 	int cpu_weight, mem_weight, total_weight;
+	double core_usage_percentage = 1; 
 	double cpu_usage, mem_usage;
 	JTextArea logTextArea;
 	boolean startMigration = false;
@@ -33,6 +34,7 @@ public class VirtualMachine
 		this.cpu_capacity = cpu_capacity;
 		this.mem_capacity = mem_capacity;
 		this.logTextArea = logTextArea;
+		bandwidth = 1 + new Random().nextInt(20); //mbps
 	}
 
 	public void runMachine(final VMRequest vmrequest) //execution time in seconds
@@ -43,6 +45,8 @@ public class VirtualMachine
 		extra_cpu_needed = vmrequest.extra_cpu;
 		extra_mem_needed = vmrequest.extra_mem;
 		exec_time = vmrequest.exec_time;
+
+		core_usage_percentage = 30 + new Random().nextInt(71);
 
 		final int extra_cpu_available = cpu_capacity - cpu_occupied;
 		final int extra_mem_available = mem_capacity - mem_occupied;

@@ -160,7 +160,7 @@ public class UserAgent extends Agent
 					}
 
 					req_trigger_count++;
-					if(req_trigger_count == 3)
+					if(req_trigger_count == 2)
 					{
 						ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 						msg.setOntology("process-with-global-cluster");
@@ -208,7 +208,7 @@ public class UserAgent extends Agent
 						fwriter.write("timelapse req_no cpureq memreq exectime extracpu extramem\n");
 						fwriter.close();
 					}
-					for(int i=1;i<=100;i++)
+					for(int i=1;i<=200;i++)
 					{
 						if(compare == true)
 						{
