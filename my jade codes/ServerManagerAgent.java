@@ -206,10 +206,11 @@ public class ServerManagerAgent extends Agent
  					if(vms[i].status == VirtualMachine.BUSY)
  						vm_temp[busy_vm_count++] = vms[i]; 
  				}
- 				double temp;
+ 				VirtualMachine temp;
  				for(i = 0; i < busy_vm_count; i++)
  				{
  					vm_temp[i].cpu_usage = vm_temp[i].cpu_occupied / (vm_temp[i].cpu_capacity * 1.0);
+ 					vm_temp[i].mem_usage = vm_temp[i].mem_occupied / (vm_temp[i].mem_capacity * 1.0);
  				}
  				//sorting acc. to cpu usage
  				for(i = 0; i < busy_vm_count - 1; i++)
@@ -218,9 +219,9 @@ public class ServerManagerAgent extends Agent
  					{
  						if(vm_temp[i].cpu_usage > vm_temp[j].cpu_usage)
  						{
- 							temp = vm_temp[i].cpu_usage;
- 							vm_temp[i].cpu_usage = vm_temp[j].cpu_usage;
- 							vm_temp[j].cpu_usage = vm_temp[i].cpu_usage;
+ 							temp = vm_temp[i];
+ 							vm_temp[i] = vm_temp[j];
+ 							vm_temp[j] = temp;
  						}
  					}
  				}
@@ -236,9 +237,9 @@ public class ServerManagerAgent extends Agent
  					{
  						if(vm_temp[i].mem_usage > vm_temp[j].mem_usage)
  						{
- 							temp = vm_temp[i].mem_usage;
- 							vm_temp[i].mem_usage = vm_temp[j].mem_usage;
- 							vm_temp[j].mem_usage = vm_temp[i].mem_usage;
+ 							temp = vm_temp[i];
+ 							vm_temp[i] = vm_temp[j];
+ 							vm_temp[j] = temp;
  						}
  					}
  				}
@@ -255,9 +256,9 @@ public class ServerManagerAgent extends Agent
  					{
  						if(vm_temp[i].total_weight > vm_temp[j].total_weight)
  						{
- 							temp = vm_temp[i].total_weight;
- 							vm_temp[i].total_weight = vm_temp[j].total_weight;
- 							vm_temp[j].total_weight = vm_temp[i].total_weight;
+ 							temp = vm_temp[i];
+ 							vm_temp[i] = vm_temp[j];
+ 							vm_temp[j] = temp;
  						}
  					}
  				}
