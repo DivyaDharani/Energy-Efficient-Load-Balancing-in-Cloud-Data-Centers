@@ -1,6 +1,6 @@
 # Energy Efficient Load Balancing in Cloud Data Centers using Clustering Technique 
 
-Applied **Cloud Computing** and **Machine Learning** Techniques 
+Applied **Cloud Computing** and **Machine Learning** Techniques to solve load balancing issues in data centers in an energy-efficient way
 
 * Implemented an efficient load balancing model for servers in data centers with K-means Clustering algorithm, an unsupervised Machine Learning technique, using JADE (Java Agent Development) framework
 * Achieved maximized resource utilization, minimized energy consumption, fewer migrations, and efficient server consolidation
